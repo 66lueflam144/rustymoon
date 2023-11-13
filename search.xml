@@ -1,6 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Funcky_Night</title>
+    <url>/rustymoon/2023/10/28/Funcky-Night/</url>
+    <content><![CDATA[<p>随手起的名字，只是忽然想起来在几首歌里都听过这个funcky。</p>
+]]></content>
+      <tags>
+        <tag>ORN</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>PHP_SSRF</title>
+    <url>/rustymoon/2023/11/13/PHP-SSRF/</url>
+    <content><![CDATA[<p>SSRF–服务端请求伪造</p>
+<span id="more"></span>
+
+
+<h1 id="SSRF危险函数"><a href="#SSRF危险函数" class="headerlink" title="SSRF危险函数"></a>SSRF危险函数</h1><h2 id="curl-exec"><a href="#curl-exec" class="headerlink" title="curl_exec()"></a>curl_exec()</h2><blockquote>
+<p>用该函数发起请求会用到libcurl库，该库支持HTTP，HTTPS，FTP，GOPHER，TELNET，DICT，FILE，IDAP协议。</p>
+<blockquote>
+<p>curl_exec() - 执行一个CURL会话</p>
+</blockquote>
+</blockquote>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">//demo.php
+<span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_SSL_VERIFYPEER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_HEADER</span><span class="token punctuation">,</span><span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_FOLLOWLOCATION</span><span class="token punctuation">,</span> <span class="token constant boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>运行之后as you can see：<br><img src="/rustymoon/66lueflam144/rustymoon/PHP-SSRF/PHP_SSRF.png"></p>
+]]></content>
+      <tags>
+        <tag>PHP</tag>
+        <tag>SSRF</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/rustymoon/2023/10/28/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -18,14 +67,5 @@
 
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
-  </entry>
-  <entry>
-    <title>Funcky_Night</title>
-    <url>/rustymoon/2023/10/28/Funcky-Night/</url>
-    <content><![CDATA[<p>随手起的名字，只是忽然想起来在几首歌里都听过这个funcky。</p>
-]]></content>
-      <tags>
-        <tag>ORN</tag>
-      </tags>
   </entry>
 </search>

@@ -22,17 +22,23 @@
     var CONFIG = {"hostname":"github.com","root":"/rustymoon/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="TAGS">
-<meta property="og:url" content="https://github.com/66lueflam144/rustymoon.git/tags/index.html">
+  <meta name="description" content="SSRF–服务端请求伪造">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP_SSRF">
+<meta property="og:url" content="https://github.com/66lueflam144/rustymoon.git/2023/11/13/PHP-SSRF/index.html">
 <meta property="og:site_name" content="RustyMoon">
+<meta property="og:description" content="SSRF–服务端请求伪造">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-10-28T08:24:41.000Z">
-<meta property="article:modified_time" content="2023-10-31T04:42:12.417Z">
+<meta property="og:image" content="https://github.com/rustymoon/66lueflam144/rustymoon/PHP-SSRF/PHP_SSRF.png">
+<meta property="article:published_time" content="2023-11-13T13:18:20.000Z">
+<meta property="article:modified_time" content="2023-11-13T13:24:12.114Z">
 <meta property="article:author" content="lueflam">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="SSRF">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/rustymoon/66lueflam144/rustymoon/PHP-SSRF/PHP_SSRF.png">
 
-<link rel="canonical" href="https://github.com/66lueflam144/rustymoon.git/tags/">
+<link rel="canonical" href="https://github.com/66lueflam144/rustymoon.git/2023/11/13/PHP-SSRF/">
 
 
 <script id="page-configurations">
@@ -40,7 +46,7 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
@@ -55,8 +61,7 @@
         }
     })();
 </script>
-  <title>TAGS | RustyMoon
-</title>
+  <title>PHP_SSRF | RustyMoon</title>
   
 
 
@@ -193,51 +198,128 @@
       <div class="main-inner">
         <div class="content-wrap">
           
-  
-  
 
-          <div class="content page posts-expand">
+          <div class="content post posts-expand">
             
 
     
-    
-    
-    <div class="post-block" lang="en">
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://github.com/66lueflam144/rustymoon.git/2023/11/13/PHP-SSRF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/rustymoon/images/fa.jpg">
+      <meta itemprop="name" content="lueflam">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RustyMoon">
+    </span>
       <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PHP_SSRF
+        </h1>
 
-<h1 class="post-title" itemprop="name headline">TAGS
-</h1>
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
 
-<div class="post-meta">
+              <time title="Created: 2023-11-13 21:18:20 / Modified: 21:24:12" itemprop="dateCreated datePublished" datetime="2023-11-13T21:18:20+08:00">2023-11-13</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>505</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>1 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>SSRF–服务端请求伪造</p>
+<span id="more"></span>
+
+
+<h1 id="SSRF危险函数"><a href="#SSRF危险函数" class="headerlink" title="SSRF危险函数"></a>SSRF危险函数</h1><h2 id="curl-exec"><a href="#curl-exec" class="headerlink" title="curl_exec()"></a>curl_exec()</h2><blockquote>
+<p>用该函数发起请求会用到libcurl库，该库支持HTTP，HTTPS，FTP，GOPHER，TELNET，DICT，FILE，IDAP协议。</p>
+<blockquote>
+<p>curl_exec() - 执行一个CURL会话</p>
+</blockquote>
+</blockquote>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">//demo.php
+<span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_SSL_VERIFYPEER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_HEADER</span><span class="token punctuation">,</span><span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_FOLLOWLOCATION</span><span class="token punctuation">,</span> <span class="token constant boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>运行之后as you can see：<br><img src="/rustymoon/66lueflam144/rustymoon/PHP-SSRF/PHP_SSRF.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/rustymoon/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/rustymoon/tags/SSRF/" rel="tag"># SSRF</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/rustymoon/2023/10/28/Funcky-Night/" rel="prev" title="Funcky_Night">
+      <i class="fa fa-chevron-left"></i> Funcky_Night
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-              3 tags in total
-            </div>
-            <div class="tag-cloud-tags">
-              <a href="/rustymoon/tags/ORN/" style="font-size: 12px; color: #ccc">ORN</a> <a href="/rustymoon/tags/PHP/" style="font-size: 12px; color: #ccc">PHP</a> <a href="/rustymoon/tags/SSRF/" style="font-size: 12px; color: #ccc">SSRF</a>
-            </div>
-          </div>
-        
-      </div>
-      
-      
-      
-    </div>
-    
-
-    
-    
-    
 
 
           </div>
@@ -288,6 +370,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSRF%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">SSRF危险函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#curl-exec"><span class="nav-number">1.1.</span> <span class="nav-text">curl_exec()</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
