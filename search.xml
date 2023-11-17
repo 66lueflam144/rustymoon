@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Funcky_Night</title>
+    <url>/rustymoon/2023/10/28/Funcky-Night/</url>
+    <content><![CDATA[<p>随手起的名字，只是忽然想起来在几首歌里都听过这个funcky。</p>
+]]></content>
+      <tags>
+        <tag>ORN</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>PHP_SSRF</title>
     <url>/rustymoon/2023/11/13/PHP-SSRF/</url>
     <content><![CDATA[<p>SSRF–服务端请求伪造</p>
@@ -41,12 +50,129 @@
       </tags>
   </entry>
   <entry>
-    <title>Funcky_Night</title>
-    <url>/rustymoon/2023/10/28/Funcky-Night/</url>
-    <content><![CDATA[<p>随手起的名字，只是忽然想起来在几首歌里都听过这个funcky。</p>
+    <title>Read-How</title>
+    <url>/rustymoon/2023/11/16/Read-How/</url>
+    <content><![CDATA[<p>读了Mark Dowd在Offensive Con的演讲的一些摘要。</p>
+<span id="more"></span>
+
+<h1 id="我的摘要"><a href="#我的摘要" class="headerlink" title="我的摘要"></a>我的摘要</h1><p>不是全部，只是摘写了我认为重要的。</p>
+<h2 id="方法论"><a href="#方法论" class="headerlink" title="方法论"></a>方法论</h2><h3 id="心态"><a href="#心态" class="headerlink" title="心态"></a>心态</h3><img src="/rustymoon/2023/11/16/Read-How/1.png" class title="一些必备的特质">
+
+<p>允许我用某三部曲来形容（因为真的很贴）</p>
+<ul>
+<li><table><tr><td bgcolor="CCCCFF">FEARLESS</td></tr></table> </li>
+<li><table><tr><td bgcolor="CCCCFF">ANTIFRAIGLE</td></tr></table></li>
+<li><table><tr><td bgcolor="CCCCFF">UNFORGIVEN</td></tr></table></li>
+</ul>
+<p><font size="1">如果你懂那么你就会懂…</font></p>
+<p>因为代码审计，寻找漏洞是一个Odessa的过程。Odessa不仅体现在读代码，也体现在如何利用，因为有些漏洞你找到了，却不知道怎么用，有些甚至是，不能利用。</p>
+<p>除了上面的三部曲，还有一个<code>curiousity</code>，其实感觉这一个适用任何一个活动或者行业。</p>
+<blockquote>
+<p>不仅好奇如何找到漏洞，更好奇漏洞如何诞生，如何运作。</p>
+</blockquote>
+<hr>
+<h3 id="BUG-PATCHING"><a href="#BUG-PATCHING" class="headerlink" title="BUG PATCHING"></a>BUG PATCHING</h3><img src="/rustymoon/2023/11/16/Read-How/bugpatching.png" class title="双刃剑">
+
+<p>安全补丁是一个双刃剑，一端对着漏洞，一端对着自己。<br>它会告诉你一些之前的漏洞信息，你可以推测漏洞成因、类型，推断一些漏洞变体&#x2F;模式——没准又成功搞出一个漏洞。</p>
+<hr>
+<h3 id="傲慢与偏见"><a href="#傲慢与偏见" class="headerlink" title="傲慢与偏见"></a>傲慢与偏见</h3><p>这里面提到两个有意思的例子</p>
+<ul>
+<li><table><tr><td bgcolor="yellow">开源和闭源谁更安全</td></tr></table>
+
+</li>
+<li><table><tr><td bgcolor="yellow">there are no more bugs in this.</td></tr></table></li>
+</ul>
+<p>一个普遍的认为是，开源更安全，毕竟那么多人都在eyes on it。但事实是，三个和尚没水喝。Mark在开源中找到很多漏洞，惊于这些地方无人维护。</p>
+<p>一个漏洞解决了就是ending了吗？就像上面提到的漏洞变体&#x2F;模式，还有相应的修复会引入一些微妙的问题——就像高中生物里面学的，遗传病，一个又一个微妙的基因通过生殖引入，最后snow crush。</p>
+<hr>
+<h3 id="“MOTTO”"><a href="#“MOTTO”" class="headerlink" title="“MOTTO”"></a>“MOTTO”</h3><p>Mark认为</p>
+<p><em>对一个程序的工作原理了解得越多，就越有可能找到漏洞，并利用它们。</em></p>
+<img src="/rustymoon/2023/11/16/Read-How/more.png" class title="MOTTO">
+
+<p>本觉得对于我们还有一条，你首先要加载 漏洞 模块。</p>
+<hr>
+<br>
+<br>
+<br>
+
+
+<h3 id="类似费曼学习法（感觉就是）"><a href="#类似费曼学习法（感觉就是）" class="headerlink" title="类似费曼学习法（感觉就是）"></a>类似费曼学习法（感觉就是）</h3><img src="/rustymoon/2023/11/16/Read-How/feiman.png" class title="费曼模块apply">
+
+<p>就像写例会PPT的时候，总在想如果对方在这里那里提出一个问题怎么办？OMG我好像答不上来。在想用比较“人话”的话来解释一个漏洞的原理和怎么运行怎么被利用的时候，就会发现自己好像也有很多不懂……准确来说，有点像“例会上的被害妄想症”。</p>
+<p><font size="1">这个方法对学习很有效，但我从来没用到我大学课程上面……不过最近看到数据结构与算法的课程设计有点挑战性，可以当作一次1 v 1的例会。</font></p>
+<hr>
+<br>
+<br>
+
+<h3 id="Attention"><a href="#Attention" class="headerlink" title="Attention"></a>Attention</h3><p><font size="1">每次提到这个词，脑海里都自动播放you got me looking for attention~</font></p>
+<blockquote>
+<p>攻击面</p>
+</blockquote>
+<img src="/rustymoon/2023/11/16/Read-How/att1.png" class title="攻击面">
+
+<p>就如图所说，漏洞只是攻击面里面的一个子集，用一句话来说就是——有人发现了一个攻击面，然后全世界的漏洞都吻了上去。</p>
+<br>
+<br>
+ 
+<blockquote>
+<p>复杂性</p>
+</blockquote>
+<img src="/rustymoon/2023/11/16/Read-How/att2.png" class title="复杂性">
+
+<p>其实没太懂这里的complexity指什么</p>
+<p>个人理解：</p>
+<ul>
+<li><table><tr><td bgcolor="yellow">应用功能的增加带来程序的复杂也带来漏洞或潜在漏洞的增加。Feature—Driven，生命不息，漏洞不止</td></tr></table>
+</li>
+<li><table><tr><td bgcolor="yellow">而开发人员对代码库的引用带来“多余功能”——只是想用代码库里某个功能，但把人一整个家族搬来，家族里面人员混杂，复杂性带来了潜在的漏洞。</td></tr></table></li>
+</ul>
+<hr>
+<br>
+<br>
+
+<h3 id="“Findings”"><a href="#“Findings”" class="headerlink" title="“Findings”"></a>“Findings”</h3><p>也就是“随时记录”，idea、漏洞、错误什么的，一方面for积少成多，一方面for随时召回。</p>
+<br>
+<br>
+
+
+<table><tr><td bgcolor="yellow">随时召回</td></tr></table>：就是字面意思了，有时候有些东西要记下来才行啊，然后一看，哦原来要搞这些，当时是这么想的。
+
+<br>
+<br>
+
+<table><tr><td bgcolor="yellow">记录失败很重要</td></tr></table>for me 平时一些install，调试，exec老是出错但都是改完就扔，下次还犯。所以多记录（document）吧……
+
+<hr>
+<h3 id="“shared-experience”"><a href="#“shared-experience”" class="headerlink" title="“shared experience”"></a>“shared experience”</h3><br>
+
+<p>这个其实是我自己取的名字<br>是对于bug patching和代码库的。当一个漏洞出现在a中，那么和a类似的b会不会也有这样的漏洞？——算法思想就那么多，这就是shared experience，再加上还是同类型，极大可能会有相同的bugs。如果没有，那么是怎么修补的呢？<br>可能人家b对于存在的bug from a的态度是：<strong>I Don’t Give A FUCK</strong>，那么就可以<em>give it a fuck</em>了（bushi）</p>
+<hr>
+<br>
+<br>
+
+<h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><p>Mark认为Best cooperation makes Best output，同时工具开发和漏洞研究是分成两个世界的——指工具开发的可能没有漏洞研究的那么了解漏洞，反之可能没那么了解工具开发。</p>
+<p>以及新手过度依赖工具，阅读和理解代码能力可能会达不到要求。往大了说我们就到了Cyberpunk的道德议题了——高度工具化的人类是否还是人类？</p>
+<p>跑远了……</p>
+<br>
+<br>
+
+<p>不过工具开发确实也很有意思。</p>
+<hr>
+<br>
+
+<h3 id="“RULES”"><a href="#“RULES”" class="headerlink" title="“RULES”"></a>“RULES”</h3><ul>
+<li><table><tr><td bgcolor="yellow">Understanding The Code</td></tr></table>
+</li>
+<li><table><tr><td bgcolor="yellow">Document Your Analysis</td></tr></table>
+</li>
+<li><table><tr><td bgcolor="yellow">Revist Code Bases</td></tr></table>
+</li>
+<li><table><tr><td bgcolor="yellow">Analyze Failures</td></tr></table></li>
+</ul>
+<p>人打不败自己的幻想？<br>半瓶子最骄傲。<br>自我中心，以为全世界eyes on me。<br>尊重more但是不在尊重范围内。<br>有条件的爱——外形、成绩……<br>kids’ love——可能是唯一感受的无条件爱。<br>在乎基本生存、财产、孩子未来，另一种在乎自己的快乐以及自己是谁</p>
 ]]></content>
       <tags>
-        <tag>ORN</tag>
+        <tag>READING</tag>
       </tags>
   </entry>
   <entry>
@@ -120,12 +246,12 @@
 </li>
 <li><p>总的来说，前台路由和后台路由的主要区别在于，前台路由是在浏览器端处理URL和页面的映射关系，而后台路由是在服务器端处理这个映射关系。前台路由通常用于单页面应用（SPA），可以提供更好的用户体验，因为页面切换时不需要刷新。而后台路由则适用于传统的多页面应用，每次页面切换时都会向服务器发送请求并刷新页面。</p>
 </li>
-<li><p><a href="https://blog.csdn.net/qq_41671718/article/details/107059370">https://blog.csdn.net/qq_41671718/article/details/107059370</a>前端路由和后端路由的区别</p>
-</li>
-<li><p><a href="https://zhuanlan.zhihu.com/p/426782949">https://zhuanlan.zhihu.com/p/426782949</a>说一说前端路由与后端路由的区别.</p>
-</li>
-<li><p><a href="https://www.cnblogs.com/benpaodexiaopangzi/p/6018186.html">https://www.cnblogs.com/benpaodexiaopangzi/p/6018186.html</a>前端路由和后台路由有什么区别？</p>
-</li>
+</ul>
+<p>一些参考：</p>
+<ul>
+<li><a href="https://blog.csdn.net/qq_41671718/article/details/107059370">前端路由和后端路由的区别</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/426782949">说一说前端路由与后端路由的区别</a></li>
+<li><a href="https://www.cnblogs.com/benpaodexiaopangzi/p/6018186.html">前端路由和后台路由有什么区别？</a></li>
 </ul>
 <hr>
 <h2 id="本cms中的前台路由"><a href="#本cms中的前台路由" class="headerlink" title="本cms中的前台路由"></a>本cms中的前台路由</h2><pre class="line-numbers language-php" data-language="php"><code class="language-php">//api.php
@@ -233,6 +359,9 @@
 <td></td>
 </tr>
 </tbody></table>
+<p>而来自工具扫描的结果：</p>
+<table><tr><td bgcolor="FF3333">文件读取函数存在变量，可能会有任意文件读取漏洞</td></tr></table>
+
 <hr>
 <h3 id="upload"><a href="#upload" class="headerlink" title="upload?"></a>upload?</h3><p>因为<code>file_get_contents()</code>没有回显，所以要有echo,查看代码其实可以看到有一个</p>
 <pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//file.php</span>
@@ -359,6 +488,7 @@
 
 <p>然后用菜刀之类的工具，URL填的就是<code>http://taocms/ice.php</code>,密码填 cmd ，ok，连上。</p>
 <p>如果直接访问<code>http://taocms/ice.php</code>其实什么也看不到，稍微修改一下<code>ice.php</code>里面写入的内容就可以实现其他的操作了。</p>
+<p>有趣的是，由于这个cms里面管理员后台可以对所有文件进行查看和编辑，所以前面那个对于文件上传的白名单完全可以被修改，也不用费力气去找其他突破点。LOL。</p>
 <hr>
 <h3 id="SQL？"><a href="#SQL？" class="headerlink" title="SQL？"></a>SQL？</h3><p>管理员界面还有一个比较显眼的<code>执行SQL</code>，所以又去看<code>sql.php</code>:</p>
 <pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token keyword">function</span> <span class="token function-definition function">excute</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>

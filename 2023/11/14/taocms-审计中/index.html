@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://github.com/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/showtables.png">
 <meta property="og:image" content="https://github.com/rustymoon/2023/11/14/taocms-%E5%AE%A1%E8%AE%A1%E4%B8%AD/showcolumns.png">
 <meta property="article:published_time" content="2023-11-14T12:08:58.000Z">
-<meta property="article:modified_time" content="2023-11-15T13:22:38.091Z">
+<meta property="article:modified_time" content="2023-11-16T11:06:46.459Z">
 <meta property="article:author" content="lueflam">
 <meta property="article:tag" content="PHP">
 <meta property="article:tag" content="代码审计">
@@ -244,7 +244,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-15 21:22:38" itemprop="dateModified" datetime="2023-11-15T21:22:38+08:00">2023-11-15</time>
+                <time title="Modified: 2023-11-16 19:06:46" itemprop="dateModified" datetime="2023-11-16T19:06:46+08:00">2023-11-16</time>
               </span>
 
           <br>
@@ -253,7 +253,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>6.9k</span>
+              <span>6.8k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -321,12 +321,12 @@
 </li>
 <li><p>总的来说，前台路由和后台路由的主要区别在于，前台路由是在浏览器端处理URL和页面的映射关系，而后台路由是在服务器端处理这个映射关系。前台路由通常用于单页面应用（SPA），可以提供更好的用户体验，因为页面切换时不需要刷新。而后台路由则适用于传统的多页面应用，每次页面切换时都会向服务器发送请求并刷新页面。</p>
 </li>
-<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41671718/article/details/107059370">https://blog.csdn.net/qq_41671718/article/details/107059370</a>前端路由和后端路由的区别</p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/426782949">https://zhuanlan.zhihu.com/p/426782949</a>说一说前端路由与后端路由的区别.</p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/benpaodexiaopangzi/p/6018186.html">https://www.cnblogs.com/benpaodexiaopangzi/p/6018186.html</a>前端路由和后台路由有什么区别？</p>
-</li>
+</ul>
+<p>一些参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41671718/article/details/107059370">前端路由和后端路由的区别</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/426782949">说一说前端路由与后端路由的区别</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/benpaodexiaopangzi/p/6018186.html">前端路由和后台路由有什么区别？</a></li>
 </ul>
 <hr>
 <h2 id="本cms中的前台路由"><a href="#本cms中的前台路由" class="headerlink" title="本cms中的前台路由"></a>本cms中的前台路由</h2><pre class="line-numbers language-php" data-language="php"><code class="language-php">//api.php
@@ -434,6 +434,9 @@
 <td></td>
 </tr>
 </tbody></table>
+<p>而来自工具扫描的结果：</p>
+<table><tr><td bgcolor="FF3333">文件读取函数存在变量，可能会有任意文件读取漏洞</td></tr></table>
+
 <hr>
 <h3 id="upload"><a href="#upload" class="headerlink" title="upload?"></a>upload?</h3><p>因为<code>file_get_contents()</code>没有回显，所以要有echo,查看代码其实可以看到有一个</p>
 <pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//file.php</span>
@@ -560,6 +563,7 @@
 
 <p>然后用菜刀之类的工具，URL填的就是<code>http://taocms/ice.php</code>,密码填 cmd ，ok，连上。</p>
 <p>如果直接访问<code>http://taocms/ice.php</code>其实什么也看不到，稍微修改一下<code>ice.php</code>里面写入的内容就可以实现其他的操作了。</p>
+<p>有趣的是，由于这个cms里面管理员后台可以对所有文件进行查看和编辑，所以前面那个对于文件上传的白名单完全可以被修改，也不用费力气去找其他突破点。LOL。</p>
 <hr>
 <h3 id="SQL？"><a href="#SQL？" class="headerlink" title="SQL？"></a>SQL？</h3><p>管理员界面还有一个比较显眼的<code>执行SQL</code>，所以又去看<code>sql.php</code>:</p>
 <pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token keyword">function</span> <span class="token function-definition function">excute</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
@@ -616,7 +620,10 @@
     <a href="/rustymoon/2023/11/13/PHP-SSRF/" rel="prev" title="PHP_SSRF">
       <i class="fa fa-chevron-left"></i> PHP_SSRF
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/rustymoon/2023/11/16/Read-How/" rel="next" title="Read-How">
+      Read-How <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -691,14 +698,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/rustymoon/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/rustymoon/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -734,12 +741,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">8k</span>
+    <span title="Symbols count total">10k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">7 mins.</span>
+    <span title="Reading time total">9 mins.</span>
 </div>
 
         
