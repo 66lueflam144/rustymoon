@@ -33,8 +33,9 @@
 <meta property="og:image" content="https://github.com/rustymoon/2023/11/13/PHP-SSRF/file.png">
 <meta property="og:image" content="https://github.com/rustymoon/2023/11/13/PHP-SSRF/atz.png">
 <meta property="og:image" content="https://github.com/rustymoon/2023/11/13/PHP-SSRF/fopen%E5%88%9D%E5%A7%8B%E5%8C%96.png">
+<meta property="og:image" content="https://github.com/rustymoon/2023/11/13/PHP-SSRF/redisinfo.png">
 <meta property="article:published_time" content="2023-11-13T13:18:20.000Z">
-<meta property="article:modified_time" content="2023-11-27T04:31:16.501Z">
+<meta property="article:modified_time" content="2023-11-27T12:05:20.643Z">
 <meta property="article:author" content="lueflam">
 <meta property="article:tag" content="PHP">
 <meta property="article:tag" content="SSRF">
@@ -239,7 +240,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-27 12:31:16" itemprop="dateModified" datetime="2023-11-27T12:31:16+08:00">2023-11-27</time>
+                <time title="Modified: 2023-11-27 20:05:20" itemprop="dateModified" datetime="2023-11-27T20:05:20+08:00">2023-11-27</time>
               </span>
 
           <br>
@@ -248,14 +249,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.8k</span>
+              <span>3.4k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>2 mins.</span>
+              <span>3 mins.</span>
             </span>
 
         </div>
@@ -303,7 +304,7 @@
 <li><p>使用白名单机制，只允许服务器访问预定义的、受信任的目标。<br>配置网络安全组和防火墙规则，限制服务器的出站访问。</p>
 </li>
 </ul>
-<h1 id="SSRF危险函数"><a href="#SSRF危险函数" class="headerlink" title="SSRF危险函数"></a>SSRF危险函数</h1><h2 id="curl-exec"><a href="#curl-exec" class="headerlink" title="curl_exec()"></a>curl_exec()</h2><blockquote>
+<h1 id="导致SSRF危险函数"><a href="#导致SSRF危险函数" class="headerlink" title="导致SSRF危险函数"></a>导致SSRF危险函数</h1><h2 id="curl-exec"><a href="#curl-exec" class="headerlink" title="curl_exec()"></a>curl_exec()</h2><blockquote>
 <p>用该函数发起请求会用到libcurl库，该库支持HTTP，HTTPS，FTP，GOPHER，TELNET，DICT，FILE，IDAP协议。</p>
 <blockquote>
 <p>curl_exec() - 执行一个CURL会话</p>
@@ -357,11 +358,73 @@
 <img src="/rustymoon/2023/11/13/PHP-SSRF/atz.png" class>
 
 <p>在测试其他位置文件之后得出：<br>只要路径正确，任意文件均可读取。</p>
+<hr>
+
 <h2 id="fopen-filename-mode-include-path-context"><a href="#fopen-filename-mode-include-path-context" class="headerlink" title="fopen(filename, mode, include_path, context)"></a>fopen(filename, mode, include_path, context)</h2><p>filename参数可控就会带来SSRF攻击</p>
 <p>看这个初始化界面warning其实也可以进一步理解一下这个函数，必需的变量就是filename，而在后续的<code>url=http://www.baidu.com</code>中又可以知道，这个filename不一定是要filename，网址也可以，这也就导致了服务端伪造请求。</p>
 <img src="/rustymoon/2023/11/13/PHP-SSRF/fopen%E5%88%9D%E5%A7%8B%E5%8C%96.png" class>
 
+<hr>
+
 <h2 id="fsockopen-hostname-port-error-errstr-timeout"><a href="#fsockopen-hostname-port-error-errstr-timeout" class="headerlink" title="fsockopen(hostname, port, [error], [errstr], [timeout])"></a>fsockopen(hostname, port, [error], [errstr], [timeout])</h2><p>hostname，port参数可控就有风险</p>
+<hr>
+
+<p>这类函数漏洞都是因为参数可控导致的。</p>
+<p>在函数之外还有协议带来的ssrf问题。</p>
+<hr>
+
+<h1 id="导致SSRF危险协议"><a href="#导致SSRF危险协议" class="headerlink" title="导致SSRF危险协议"></a>导致SSRF危险协议</h1><h2 id="1"><a href="#1" class="headerlink" title="1"></a>1</h2><p><code>HTTP</code>一般使用它的请求<code>GET</code>来获取资源，也可以结合intruder用作一个简单的扫描端口。</p>
+<p><code>file</code>协议通过文件相对路径和echo等回显条件进行任意文件读取。</p>
+<p>举个例子：</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_HEADER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_SSL_VERIFYPEER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_FOLLOWLOCATION</span><span class="token punctuation">,</span> <span class="token constant boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>假设运行的网址是：<br><code>http://localhost:63342/testtt/ssrfdemo.php</code></p>
+<p>构造一个file协议的url：</p>
+<p><code>http://localhost:63342/testtt/ssrfdemo.php?url=file:///C:/Gods.txt</code></p>
+<p>得到了Gods.txt的内容回显。</p>
+<p>curl虽然没有echo，但它通过指向HTTP请求，将请求的内容获取到，这些内容变成HTTP响应的一部分返回，也就做到了内容的回显，完成任意文件读取。</p>
+<h2 id="获取服务的banner"><a href="#获取服务的banner" class="headerlink" title="获取服务的banner"></a>获取服务的banner</h2><blockquote>
+<p>网络服务是一种在计算机网络上运行的应用程序或进程，它提供某种功能或服务。</p>
+</blockquote>
+<blockquote>
+<p>服务 banner 是指在与服务建立连接时服务所返回的信息，通常包含有关服务的版本、类型和其他相关信息。</p>
+</blockquote>
+<ul>
+<li>“有 banner 的服务” 是指在与客户端建立连接时，服务会发送一段包含有关服务的信息的文本。这段信息通常包括有关服务的类型、版本和其他相关信息。这个信息传输的过程就是服务发送 banner。</li>
+</ul>
+<br>
+
+<p>举例来说，一个 Web 服务器的 banner 信息可能包含有关服务器软件和版本的信息，如 “Apache&#x2F;2.4.29 (Ubuntu)”。类似地，SSH 服务可能在连接时发送 banner，例如 “SSH-2.0-OpenSSH_7.9p1 Debian-10+deb10u2”。</p>
+<p>在网络安全和渗透测试中，分析服务的 banner 信息是一种常见的方法，因为这可以提供有关目标系统的有用信息。这些信息可能包括已知的漏洞、弱点或系统配置的信息，为安全研究人员、渗透测试人员或攻击者提供了更深入的了解。</p>
+<hr>
+<h2 id="dict"><a href="#dict" class="headerlink" title="dict"></a>dict</h2><blockquote>
+<p>Dict（Dictionary）协议主要用于在计算机网络中传输键值对。这种协议的基本思想是在客户端和服务器之间交换包含键值对信息的消息。</p>
+</blockquote>
+<p>用数据库开源系统redis举例：</p>
+<p>（在 Redis 中，Dict 协议是一种用于与 Redis 服务器进行通信的协议。客户端通过向 Redis 服务器发送符合 Dict 协议的命令，实现对键值对存储的操作，如设置值、获取值、删除键等。Redis 本质上是一个键值对存储系统，它支持多种数据结构，包括字符串、哈希表、列表、集合等，而 Dict 协议用于与这些数据结构进行交互。）</p>
+<p>只是简单举一个例子：<br><strong>获取redis信息</strong></p>
+<p><code>http://localhost:63342/demo/demotest.php?url=dict://127.0.0.1:6379/info</code></p>
+<img src="/rustymoon/2023/11/13/PHP-SSRF/redisinfo.png" class>
+
+
+
+<p>虽然 Redis 是一个非常典型的使用 Dict 协议的系统，但 Dict 协议本身并不局限于 Redis。它是一种通用的键值对传输协议，可以被应用于其他需要在客户端和服务器之间传输键值对信息的场景。在某些情况下，开发人员可能会实现自己的应用层协议，以适应特定的应用需求。</p>
 
     </div>
 
@@ -446,7 +509,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSRF"><span class="nav-number">1.</span> <span class="nav-text">SSRF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SSRF-%E7%9A%84%E4%B8%80%E8%88%AC%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%E5%92%8C%E6%94%BB%E5%87%BB%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">SSRF 的一般工作原理和攻击场景：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSRF-%E5%8F%AF%E8%83%BD%E5%AF%BC%E8%87%B4%E4%BB%A5%E4%B8%8B%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="nav-number">1.2.</span> <span class="nav-text">SSRF 可能导致以下安全问题：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%B2%E8%8C%83"><span class="nav-number">1.3.</span> <span class="nav-text">防范</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSRF%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">SSRF危险函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#curl-exec"><span class="nav-number">2.1.</span> <span class="nav-text">curl_exec()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-contents"><span class="nav-number">2.2.</span> <span class="nav-text">file_contents()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fopen-filename-mode-include-path-context"><span class="nav-number">2.3.</span> <span class="nav-text">fopen(filename, mode, include_path, context)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fsockopen-hostname-port-error-errstr-timeout"><span class="nav-number">2.4.</span> <span class="nav-text">fsockopen(hostname, port, [error], [errstr], [timeout])</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSRF"><span class="nav-number">1.</span> <span class="nav-text">SSRF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SSRF-%E7%9A%84%E4%B8%80%E8%88%AC%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86%E5%92%8C%E6%94%BB%E5%87%BB%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">SSRF 的一般工作原理和攻击场景：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSRF-%E5%8F%AF%E8%83%BD%E5%AF%BC%E8%87%B4%E4%BB%A5%E4%B8%8B%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="nav-number">1.2.</span> <span class="nav-text">SSRF 可能导致以下安全问题：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%B2%E8%8C%83"><span class="nav-number">1.3.</span> <span class="nav-text">防范</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%BC%E8%87%B4SSRF%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">导致SSRF危险函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#curl-exec"><span class="nav-number">2.1.</span> <span class="nav-text">curl_exec()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-contents"><span class="nav-number">2.2.</span> <span class="nav-text">file_contents()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fopen-filename-mode-include-path-context"><span class="nav-number">2.3.</span> <span class="nav-text">fopen(filename, mode, include_path, context)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fsockopen-hostname-port-error-errstr-timeout"><span class="nav-number">2.4.</span> <span class="nav-text">fsockopen(hostname, port, [error], [errstr], [timeout])</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%BC%E8%87%B4SSRF%E5%8D%B1%E9%99%A9%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.</span> <span class="nav-text">导致SSRF危险协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1"><span class="nav-number">3.1.</span> <span class="nav-text">1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%9C%8D%E5%8A%A1%E7%9A%84banner"><span class="nav-number">3.2.</span> <span class="nav-text">获取服务的banner</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dict"><span class="nav-number">3.3.</span> <span class="nav-text">dict</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -505,12 +568,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">12k</span>
+    <span title="Symbols count total">15k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">11 mins.</span>
+    <span title="Reading time total">14 mins.</span>
 </div>
 
         
