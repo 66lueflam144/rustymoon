@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Funcky_Night</title>
+    <url>/rustymoon/2023/10/28/Funcky-Night/</url>
+    <content><![CDATA[<p>随手起的名字，只是忽然想起来在几首歌里都听过这个funcky。</p>
+]]></content>
+      <tags>
+        <tag>ORN</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>2019]安洵杯 easy_serialize_php</title>
     <url>/rustymoon/2023/12/04/2019-easy-serialize-php/</url>
     <content><![CDATA[<p>it’s been a long time to do ctf</p>
@@ -251,21 +260,15 @@ bool(false)<span aria-hidden="true" class="line-numbers-rows"><span></span><span
 <p>可以看到 img 键值已经出现且重写。</p>
 <p>接收响应会得到</p>
 <p><code>$flag = &#39;flag in /d0g3_fllllllag&#39;;</code></p>
+<img src="/rustymoon/2023/12/04/2019-easy-serialize-php/get.png" class>
+
 <p>将那段字符base64 后甩入img值中，接收响应得到flag。</p>
 <h1 id="Q"><a href="#Q" class="headerlink" title="Q"></a>Q</h1><p>其实payload在进行反序列化的时候会出现问题，返回bool(false)，但是为什么依旧可以进行，有点不理解。</p>
+<img src="/rustymoon/2023/12/04/2019-easy-serialize-php/boolfalse.png" class>
 ]]></content>
       <tags>
         <tag>CTF</tag>
         <tag>反序列化</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Funcky_Night</title>
-    <url>/rustymoon/2023/10/28/Funcky-Night/</url>
-    <content><![CDATA[<p>随手起的名字，只是忽然想起来在几首歌里都听过这个funcky。</p>
-]]></content>
-      <tags>
-        <tag>ORN</tag>
       </tags>
   </entry>
   <entry>
