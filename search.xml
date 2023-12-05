@@ -272,172 +272,6 @@ bool(false)<span aria-hidden="true" class="line-numbers-rows"><span></span><span
       </tags>
   </entry>
   <entry>
-    <title>PHP_SSRF</title>
-    <url>/rustymoon/2023/11/13/PHP-SSRF/</url>
-    <content><![CDATA[<h1 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h1><p><strong>SSRF–服务端请求伪造</strong></p>
-<blockquote>
-<p>服务端伪造请求（Server-Side Request Forgery，SSRF）是一种安全漏洞，攻击者通过操纵服务器发起的请求，使其访问目标服务器或资源，从而在服务端执行未经授权的操作。这种攻击通常发生在应用程序未正确验证或过滤用户提供的输入数据时。</p>
-</blockquote>
-<span id="more"></span>
-
-<h2 id="SSRF-的一般工作原理和攻击场景："><a href="#SSRF-的一般工作原理和攻击场景：" class="headerlink" title="SSRF 的一般工作原理和攻击场景："></a>SSRF 的一般工作原理和攻击场景：</h2><ul>
-<li><p>用户输入未经验证： 应用程序接收用户提供的 URL 或其他输入，但未正确验证或过滤该输入。</p>
-</li>
-<li><p>攻击者构造恶意请求： 攻击者通过在用户输入中插入恶意的 URL，构造一个特殊的请求，使服务器在其内部网络中访问或执行操作。</p>
-</li>
-<li><p>利用服务端发起请求： 服务器使用用户提供的输入作为目标地址，发起一个 HTTP、DNS 或其他类型的请求。</p>
-</li>
-<li><p>攻击目标： 请求可能指向内部网络资源、本地文件系统、或其他敏感信息。攻击者的目标是获取未经授权的数据、执行操作，或者进一步滥用内部网络。</p>
-</li>
-</ul>
-<hr>
-
-<h2 id="SSRF-可能导致以下安全问题："><a href="#SSRF-可能导致以下安全问题：" class="headerlink" title="SSRF 可能导致以下安全问题："></a>SSRF 可能导致以下安全问题：</h2><ul>
-<li><p>内部资源访问： 攻击者可以尝试访问服务器内部网络中的敏感资源，如数据库、内部API或其他服务。</p>
-</li>
-<li><p>绕过防火墙： 通过将请求发送到内部网络，攻击者可能绕过防火墙和网络隔离的保护措施。</p>
-</li>
-<li><p>信息泄露： 攻击者可以通过观察请求的响应来收集关于目标系统的信息，如错误消息、调试信息等。</p>
-</li>
-</ul>
-<hr>
-
-<h2 id="防范"><a href="#防范" class="headerlink" title="防范"></a>防范</h2><ul>
-<li><p>对用户输入进行严格的验证和过滤，确保输入数据是合法的 URL，并限制访问的范围。</p>
-</li>
-<li><p>在服务器配置中，避免将用户提供的输入作为请求目标，特别是在涉及敏感操作的情况下。</p>
-</li>
-<li><p>使用白名单机制，只允许服务器访问预定义的、受信任的目标。<br>配置网络安全组和防火墙规则，限制服务器的出站访问。</p>
-</li>
-</ul>
-<h1 id="导致SSRF危险函数"><a href="#导致SSRF危险函数" class="headerlink" title="导致SSRF危险函数"></a>导致SSRF危险函数</h1><h2 id="curl-exec"><a href="#curl-exec" class="headerlink" title="curl_exec()"></a>curl_exec()</h2><blockquote>
-<p>用该函数发起请求会用到libcurl库，该库支持HTTP，HTTPS，FTP，GOPHER，TELNET，DICT，FILE，IDAP协议。</p>
-<blockquote>
-<p>curl_exec() - 执行一个CURL会话</p>
-</blockquote>
-</blockquote>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php">//demo.php
-<span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_SSL_VERIFYPEER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_HEADER</span><span class="token punctuation">,</span><span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_FOLLOWLOCATION</span><span class="token punctuation">,</span> <span class="token constant boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>运行之后as you can see：</p>
-<img src="/rustymoon/2023/11/13/PHP-SSRF/PHP_SSRF.png" class title="SSRFpic">
-
-
-<h2 id="file-contents"><a href="#file-contents" class="headerlink" title="file_contents()"></a>file_contents()</h2><p>比前者更为简洁的代码，实现一样的功能</p>
-<p>file_contents(path, include_path, context, start, max_length):</p>
-<ul>
-<li>path 必需。所读取文件名（如果没有会报错no suc）</li>
-<li>include_path </li>
-<li>context</li>
-<li>start 开始读取的位置</li>
-<li>max_length 读取的字节数</li>
-</ul>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php">//一个demo
-<span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>效果如下</p>
-<img src="/rustymoon/2023/11/13/PHP-SSRF/file.png" class>
-
-<p>然后尝试同文件夹下读取文件内容</p>
-<img src="/rustymoon/2023/11/13/PHP-SSRF/atz.png" class>
-
-<p>在测试其他位置文件之后得出：<br>只要路径正确，任意文件均可读取。</p>
-<hr>
-
-<h2 id="fopen-filename-mode-include-path-context"><a href="#fopen-filename-mode-include-path-context" class="headerlink" title="fopen(filename, mode, include_path, context)"></a>fopen(filename, mode, include_path, context)</h2><p>filename参数可控就会带来SSRF攻击</p>
-<p>看这个初始化界面warning其实也可以进一步理解一下这个函数，必需的变量就是filename，而在后续的<code>url=http://www.baidu.com</code>中又可以知道，这个filename不一定是要filename，网址也可以，这也就导致了服务端伪造请求。</p>
-<img src="/rustymoon/2023/11/13/PHP-SSRF/fopen%E5%88%9D%E5%A7%8B%E5%8C%96.png" class>
-
-<hr>
-
-<h2 id="fsockopen-hostname-port-error-errstr-timeout"><a href="#fsockopen-hostname-port-error-errstr-timeout" class="headerlink" title="fsockopen(hostname, port, [error], [errstr], [timeout])"></a>fsockopen(hostname, port, [error], [errstr], [timeout])</h2><p>hostname，port参数可控就有风险</p>
-<hr>
-
-<p>这类函数漏洞都是因为参数可控导致的。</p>
-<p>在函数之外还有协议带来的ssrf问题。</p>
-<hr>
-
-<h1 id="导致SSRF危险协议"><a href="#导致SSRF危险协议" class="headerlink" title="导致SSRF危险协议"></a>导致SSRF危险协议</h1><h2 id="1"><a href="#1" class="headerlink" title="1"></a>1</h2><p><code>HTTP</code>一般使用它的请求<code>GET</code>来获取资源，也可以结合intruder用作一个简单的扫描端口。</p>
-<p><code>file</code>协议通过文件相对路径和echo等回显条件进行任意文件读取。</p>
-<p>举个例子：</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_HEADER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_SSL_VERIFYPEER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_FOLLOWLOCATION</span><span class="token punctuation">,</span> <span class="token constant boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>假设运行的网址是：<br><code>http://localhost:63342/testtt/ssrfdemo.php</code></p>
-<p>构造一个file协议的url：</p>
-<p><code>http://localhost:63342/testtt/ssrfdemo.php?url=file:///C:/Gods.txt</code></p>
-<p>得到了Gods.txt的内容回显。</p>
-<p>curl虽然没有echo，但它通过指向HTTP请求，将请求的内容获取到，这些内容变成HTTP响应的一部分返回，也就做到了内容的回显，完成任意文件读取。</p>
-<h2 id="获取服务的banner"><a href="#获取服务的banner" class="headerlink" title="获取服务的banner"></a>获取服务的banner</h2><blockquote>
-<p>网络服务是一种在计算机网络上运行的应用程序或进程，它提供某种功能或服务。</p>
-</blockquote>
-<blockquote>
-<p>服务 banner 是指在与服务建立连接时服务所返回的信息，通常包含有关服务的版本、类型和其他相关信息。</p>
-</blockquote>
-<ul>
-<li>“有 banner 的服务” 是指在与客户端建立连接时，服务会发送一段包含有关服务的信息的文本。这段信息通常包括有关服务的类型、版本和其他相关信息。这个信息传输的过程就是服务发送 banner。</li>
-</ul>
-<br>
-
-<p>举例来说，一个 Web 服务器的 banner 信息可能包含有关服务器软件和版本的信息，如 “Apache&#x2F;2.4.29 (Ubuntu)”。类似地，SSH 服务可能在连接时发送 banner，例如 “SSH-2.0-OpenSSH_7.9p1 Debian-10+deb10u2”。</p>
-<p>在网络安全和渗透测试中，分析服务的 banner 信息是一种常见的方法，因为这可以提供有关目标系统的有用信息。这些信息可能包括已知的漏洞、弱点或系统配置的信息，为安全研究人员、渗透测试人员或攻击者提供了更深入的了解。</p>
-<hr>
-<h2 id="dict"><a href="#dict" class="headerlink" title="dict"></a>dict</h2><blockquote>
-<p>Dict（Dictionary）协议主要用于在计算机网络中传输键值对。这种协议的基本思想是在客户端和服务器之间交换包含键值对信息的消息。</p>
-</blockquote>
-<p>用数据库开源系统redis举例：</p>
-<p>（在 Redis 中，Dict 协议是一种用于与 Redis 服务器进行通信的协议。客户端通过向 Redis 服务器发送符合 Dict 协议的命令，实现对键值对存储的操作，如设置值、获取值、删除键等。Redis 本质上是一个键值对存储系统，它支持多种数据结构，包括字符串、哈希表、列表、集合等，而 Dict 协议用于与这些数据结构进行交互。）</p>
-<p>只是简单举一个例子：<br><strong>获取redis信息</strong></p>
-<p><code>http://localhost:63342/demo/demotest.php?url=dict://127.0.0.1:6379/info</code></p>
-<img src="/rustymoon/2023/11/13/PHP-SSRF/redisinfo.png" class>
-
-
-
-<p>虽然 Redis 是一个非常典型的使用 Dict 协议的系统，但 Dict 协议本身并不局限于 Redis。它是一种通用的键值对传输协议，可以被应用于其他需要在客户端和服务器之间传输键值对信息的场景。在某些情况下，开发人员可能会实现自己的应用层协议，以适应特定的应用需求。</p>
-]]></content>
-      <tags>
-        <tag>PHP</tag>
-        <tag>SSRF</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>PHP_SQL-Injection</title>
     <url>/rustymoon/2023/11/20/PHP-SQL-Injection/</url>
     <content><![CDATA[<p>有点好久不见，之前在入门之处学的第一个就是这个漏洞，不过那个时候学的是漏洞，没有涉及到专门分语言的。</p>
@@ -650,9 +484,175 @@ Stack trace:
 
 <h2 id="盲注"><a href="#盲注" class="headerlink" title="盲注"></a>盲注</h2>]]></content>
       <tags>
-        <tag>PHP</tag>
         <tag>LEARN</tag>
+        <tag>PHP</tag>
         <tag>SQL-Injection</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>PHP_SSRF</title>
+    <url>/rustymoon/2023/11/13/PHP-SSRF/</url>
+    <content><![CDATA[<h1 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h1><p><strong>SSRF–服务端请求伪造</strong></p>
+<blockquote>
+<p>服务端伪造请求（Server-Side Request Forgery，SSRF）是一种安全漏洞，攻击者通过操纵服务器发起的请求，使其访问目标服务器或资源，从而在服务端执行未经授权的操作。这种攻击通常发生在应用程序未正确验证或过滤用户提供的输入数据时。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="SSRF-的一般工作原理和攻击场景："><a href="#SSRF-的一般工作原理和攻击场景：" class="headerlink" title="SSRF 的一般工作原理和攻击场景："></a>SSRF 的一般工作原理和攻击场景：</h2><ul>
+<li><p>用户输入未经验证： 应用程序接收用户提供的 URL 或其他输入，但未正确验证或过滤该输入。</p>
+</li>
+<li><p>攻击者构造恶意请求： 攻击者通过在用户输入中插入恶意的 URL，构造一个特殊的请求，使服务器在其内部网络中访问或执行操作。</p>
+</li>
+<li><p>利用服务端发起请求： 服务器使用用户提供的输入作为目标地址，发起一个 HTTP、DNS 或其他类型的请求。</p>
+</li>
+<li><p>攻击目标： 请求可能指向内部网络资源、本地文件系统、或其他敏感信息。攻击者的目标是获取未经授权的数据、执行操作，或者进一步滥用内部网络。</p>
+</li>
+</ul>
+<hr>
+
+<h2 id="SSRF-可能导致以下安全问题："><a href="#SSRF-可能导致以下安全问题：" class="headerlink" title="SSRF 可能导致以下安全问题："></a>SSRF 可能导致以下安全问题：</h2><ul>
+<li><p>内部资源访问： 攻击者可以尝试访问服务器内部网络中的敏感资源，如数据库、内部API或其他服务。</p>
+</li>
+<li><p>绕过防火墙： 通过将请求发送到内部网络，攻击者可能绕过防火墙和网络隔离的保护措施。</p>
+</li>
+<li><p>信息泄露： 攻击者可以通过观察请求的响应来收集关于目标系统的信息，如错误消息、调试信息等。</p>
+</li>
+</ul>
+<hr>
+
+<h2 id="防范"><a href="#防范" class="headerlink" title="防范"></a>防范</h2><ul>
+<li><p>对用户输入进行严格的验证和过滤，确保输入数据是合法的 URL，并限制访问的范围。</p>
+</li>
+<li><p>在服务器配置中，避免将用户提供的输入作为请求目标，特别是在涉及敏感操作的情况下。</p>
+</li>
+<li><p>使用白名单机制，只允许服务器访问预定义的、受信任的目标。<br>配置网络安全组和防火墙规则，限制服务器的出站访问。</p>
+</li>
+</ul>
+<h1 id="导致SSRF危险函数"><a href="#导致SSRF危险函数" class="headerlink" title="导致SSRF危险函数"></a>导致SSRF危险函数</h1><h2 id="curl-exec"><a href="#curl-exec" class="headerlink" title="curl_exec()"></a>curl_exec()</h2><blockquote>
+<p>用该函数发起请求会用到libcurl库，该库支持HTTP，HTTPS，FTP，GOPHER，TELNET，DICT，FILE，IDAP协议。</p>
+<blockquote>
+<p>curl_exec() - 执行一个CURL会话</p>
+</blockquote>
+</blockquote>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">//demo.php
+<span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_SSL_VERIFYPEER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_HEADER</span><span class="token punctuation">,</span><span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_FOLLOWLOCATION</span><span class="token punctuation">,</span> <span class="token constant boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>运行之后as you can see：</p>
+<img src="/rustymoon/2023/11/13/PHP-SSRF/PHP_SSRF.png" class title="SSRFpic">
+
+
+<h2 id="file-contents"><a href="#file-contents" class="headerlink" title="file_contents()"></a>file_contents()</h2><p>比前者更为简洁的代码，实现一样的功能</p>
+<p>file_contents(path, include_path, context, start, max_length):</p>
+<ul>
+<li>path 必需。所读取文件名（如果没有会报错no suc）</li>
+<li>include_path </li>
+<li>context</li>
+<li>start 开始读取的位置</li>
+<li>max_length 读取的字节数</li>
+</ul>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php">//一个demo
+<span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>效果如下</p>
+<img src="/rustymoon/2023/11/13/PHP-SSRF/file.png" class>
+
+<p>然后尝试同文件夹下读取文件内容</p>
+<img src="/rustymoon/2023/11/13/PHP-SSRF/atz.png" class>
+
+<p>在测试其他位置文件之后得出：<br>只要路径正确，任意文件均可读取。</p>
+<hr>
+
+<h2 id="fopen-filename-mode-include-path-context"><a href="#fopen-filename-mode-include-path-context" class="headerlink" title="fopen(filename, mode, include_path, context)"></a>fopen(filename, mode, include_path, context)</h2><p>filename参数可控就会带来SSRF攻击</p>
+<p>看这个初始化界面warning其实也可以进一步理解一下这个函数，必需的变量就是filename，而在后续的<code>url=http://www.baidu.com</code>中又可以知道，这个filename不一定是要filename，网址也可以，这也就导致了服务端伪造请求。</p>
+<img src="/rustymoon/2023/11/13/PHP-SSRF/fopen%E5%88%9D%E5%A7%8B%E5%8C%96.png" class>
+
+<hr>
+
+<h2 id="fsockopen-hostname-port-error-errstr-timeout"><a href="#fsockopen-hostname-port-error-errstr-timeout" class="headerlink" title="fsockopen(hostname, port, [error], [errstr], [timeout])"></a>fsockopen(hostname, port, [error], [errstr], [timeout])</h2><p>hostname，port参数可控就有风险</p>
+<hr>
+
+<p>这类函数漏洞都是因为参数可控导致的。</p>
+<p>在函数之外还有协议带来的ssrf问题。</p>
+<hr>
+
+<h1 id="导致SSRF危险协议"><a href="#导致SSRF危险协议" class="headerlink" title="导致SSRF危险协议"></a>导致SSRF危险协议</h1><h2 id="1"><a href="#1" class="headerlink" title="1"></a>1</h2><p><code>HTTP</code>一般使用它的请求<code>GET</code>来获取资源，也可以结合intruder用作一个简单的扫描端口。</p>
+<p><code>file</code>协议通过文件相对路径和echo等回显条件进行任意文件读取。</p>
+<p>举个例子：</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">header</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"Content-Type: text/html; charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token variable">$url</span> <span class="token operator">=</span> <span class="token variable">$_REQUEST</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'url'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token variable">$ch</span> <span class="token operator">=</span> <span class="token function">curl_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_URL</span><span class="token punctuation">,</span> <span class="token variable">$url</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_HEADER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_SSL_VERIFYPEER</span><span class="token punctuation">,</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_FOLLOWLOCATION</span><span class="token punctuation">,</span> <span class="token constant boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">curl_setopt</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">,</span> <span class="token constant">CURLOPT_RETURNTRANSFER</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_exec</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">curl_close</span><span class="token punctuation">(</span><span class="token variable">$ch</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token delimiter important">?></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>假设运行的网址是：<br><code>http://localhost:63342/testtt/ssrfdemo.php</code></p>
+<p>构造一个file协议的url：</p>
+<p><code>http://localhost:63342/testtt/ssrfdemo.php?url=file:///C:/Gods.txt</code></p>
+<p>得到了Gods.txt的内容回显。</p>
+<p>curl虽然没有echo，但它通过指向HTTP请求，将请求的内容获取到，这些内容变成HTTP响应的一部分返回，也就做到了内容的回显，完成任意文件读取。</p>
+<h2 id="获取服务的banner"><a href="#获取服务的banner" class="headerlink" title="获取服务的banner"></a>获取服务的banner</h2><blockquote>
+<p>网络服务是一种在计算机网络上运行的应用程序或进程，它提供某种功能或服务。</p>
+</blockquote>
+<blockquote>
+<p>服务 banner 是指在与服务建立连接时服务所返回的信息，通常包含有关服务的版本、类型和其他相关信息。</p>
+</blockquote>
+<ul>
+<li>“有 banner 的服务” 是指在与客户端建立连接时，服务会发送一段包含有关服务的信息的文本。这段信息通常包括有关服务的类型、版本和其他相关信息。这个信息传输的过程就是服务发送 banner。</li>
+</ul>
+<br>
+
+<p>举例来说，一个 Web 服务器的 banner 信息可能包含有关服务器软件和版本的信息，如 “Apache&#x2F;2.4.29 (Ubuntu)”。类似地，SSH 服务可能在连接时发送 banner，例如 “SSH-2.0-OpenSSH_7.9p1 Debian-10+deb10u2”。</p>
+<p>在网络安全和渗透测试中，分析服务的 banner 信息是一种常见的方法，因为这可以提供有关目标系统的有用信息。这些信息可能包括已知的漏洞、弱点或系统配置的信息，为安全研究人员、渗透测试人员或攻击者提供了更深入的了解。</p>
+<hr>
+<h2 id="dict"><a href="#dict" class="headerlink" title="dict"></a>dict</h2><blockquote>
+<p>Dict（Dictionary）协议主要用于在计算机网络中传输键值对。这种协议的基本思想是在客户端和服务器之间交换包含键值对信息的消息。</p>
+</blockquote>
+<p>用数据库开源系统redis举例：</p>
+<p>（在 Redis 中，Dict 协议是一种用于与 Redis 服务器进行通信的协议。客户端通过向 Redis 服务器发送符合 Dict 协议的命令，实现对键值对存储的操作，如设置值、获取值、删除键等。Redis 本质上是一个键值对存储系统，它支持多种数据结构，包括字符串、哈希表、列表、集合等，而 Dict 协议用于与这些数据结构进行交互。）</p>
+<p>只是简单举一个例子：<br><strong>获取redis信息</strong></p>
+<p><code>http://localhost:63342/demo/demotest.php?url=dict://127.0.0.1:6379/info</code></p>
+<img src="/rustymoon/2023/11/13/PHP-SSRF/redisinfo.png" class>
+
+
+
+<p>虽然 Redis 是一个非常典型的使用 Dict 协议的系统，但 Dict 协议本身并不局限于 Redis。它是一种通用的键值对传输协议，可以被应用于其他需要在客户端和服务器之间传输键值对信息的场景。在某些情况下，开发人员可能会实现自己的应用层协议，以适应特定的应用需求。</p>
+]]></content>
+      <tags>
+        <tag>PHP</tag>
+        <tag>SSRF</tag>
       </tags>
   </entry>
   <entry>
@@ -1021,7 +1021,10 @@ Stack trace:
   <entry>
     <title>daily</title>
     <url>/rustymoon/2023/11/26/daily/</url>
-    <content><![CDATA[<h1 id="11-26"><a href="#11-26" class="headerlink" title="11-26"></a>11-26</h1><p>这个周在当尖叫皇后，就是别人负责皇后我负责尖叫。</p>
+    <content><![CDATA[<p>No Glamour in the hammer~</p>
+<span id="more"></span>
+
+<h1 id="11-26"><a href="#11-26" class="headerlink" title="11-26"></a>11-26</h1><p>这个周在当尖叫皇后，就是别人负责皇后我负责尖叫。</p>
 <p>我也不知道为什么这个周会过得如此迷惑的忙碌。</p>
 <p>可能是快来到的期末和一堆被冷落的作业。</p>
 <p>所以本周我就做了一个firewall ppt，做了实验课的实验一。</p>
