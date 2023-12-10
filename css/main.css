@@ -1193,7 +1193,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #cbffff;
+  background: #417d86;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2479,7 +2479,7 @@ ul.breadcrumb li + li:last-child {
   border-bottom-color: #fc6423;
 }
 .sidebar {
-  background: var(--body-bg-color);
+  background: var(#808080);
   box-shadow: none;
   margin-top: 100%;
   position: static;
@@ -2581,7 +2581,7 @@ ul.breadcrumb li + li:last-child {
   padding: 0;
 }
 body {
-  background: url("https://images.unsplash.com/photo-1554907984-15263bfd63bd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+  background: url("https://images.unsplash.com/photo-1701280156022-6e1d9d8380fe?q=80&w=2075&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
@@ -2598,4 +2598,9 @@ body {
 }
 .post-toc {
   background-color: #fff;
+}
+.sidebar {
+  border-right: 1px solid #ccc;
+  background-color: #f0f0f0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }

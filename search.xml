@@ -275,6 +275,12 @@ bool(false)<span aria-hidden="true" class="line-numbers-rows"><span></span><span
 <h1 id="Categories"><a href="#Categories" class="headerlink" title="Categories"></a>Categories</h1><img src="/rustymoon/2023/11/20/PHP-SQL-Injection/SQL-Injection.png" class title="SQL注入分类">
 
 <p>之前单独学习的时候，只学到报错注入、盲注、堆叠注入，就觉得OMG怎么这么难，堪比现在的我面对数电实验之4位并行加法器。</p>
+<hr>
+<hr>
+
+
+
+
 <h1 id="init"><a href="#init" class="headerlink" title="init()"></a>init()</h1><p>在开始之前，先搞好配置吧。</p>
 <p>phptorm + XAMPP</p>
 <p>有phpstorm最好，没有的请有phpstudy或者XAMPP之类工具（有phpstorm也要有当然如果你自己本地有php就不需要了）。</p>
@@ -473,7 +479,10 @@ Stack trace:
 <hr>
 <hr>
 
-<h2 id="盲注"><a href="#盲注" class="headerlink" title="盲注"></a>盲注</h2>]]></content>
+<h2 id="盲注"><a href="#盲注" class="headerlink" title="盲注"></a>盲注</h2><hr>
+
+<p>(SQL注入)[<a href="https://ctf-wiki.org/web/sqli/]">https://ctf-wiki.org/web/sqli/]</a></p>
+]]></content>
       <tags>
         <tag>LEARN</tag>
         <tag>PHP</tag>
@@ -1019,6 +1028,225 @@ Stack trace:
       </tags>
   </entry>
   <entry>
+    <title>SQLi_labs</title>
+    <url>/rustymoon/2023/12/07/SQLi-labs/</url>
+    <content><![CDATA[<p>真的久远又模糊……说是sqli lab其实是重新整理和学习SQL注入</p>
+<span id="more"></span>
+
+<h1 id="Less-1"><a href="#Less-1" class="headerlink" title="Less-1"></a>Less-1</h1><p>结合着源码看</p>
+<h2 id="‘"><a href="#‘" class="headerlink" title="‘"></a>‘</h2><p><code>$sql=&quot;SELECT * FROM users WHERE id=&#39;$id&#39; LIMIT 0,1&quot;;</code></p>
+<ul>
+<li>当注入<code>id=1&#39;</code>时，得到<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''1'' LIMIT 0,1' at line 1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ul>
+<p>对照着翻译一下，<br>SELECT * FROM users WHERE id &#x3D;’1’’ LIMIT 0,1<br>那个报错信息是’error message’，所以可能会误以为是<code>&#39;&#39;1&#39;&#39;</code>。</p>
+<p>而当<code>id=1&quot;</code>时，</p>
+<p>SELECT * FROM users WHERE id &#x3D; ‘1”‘ LIMIT 0,1</p>
+<p>双引号被看作是id的值的一部分，并不会截断原语句，所以就正常输出dumb。</p>
+<h2 id="or"><a href="#or" class="headerlink" title="or"></a>or</h2><ul>
+<li>当<code>id=1&#39; or &#39;1&#39; = &#39;1</code>的时候</li>
+</ul>
+<p>SELECT * FROM users WHERE id &#x3D; ‘1’ or ‘1’ &#x3D; ‘1’</p>
+<p>因为 or之前的语句 正确，被理解为查询 id &#x3D; 1，而后面的语句也判断为正确，所以整个payload被认为 正确，这会返回所有的用户信息</p>
+<p><code>id = 2&#39; or &#39;1&#39; = &#39;1</code>的时候返回的是用户的 id&#x3D;1 的信息，这和上面没有解释的 返回所有用户信息 有关。</p>
+<p>拿之前那个数据库的user表来举例：</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/sql1.png" class>
+<p>需要注意的是这里的 payload版本是 id &#x3D; 1’ or ‘1’&#x3D;’1</p>
+<p><code>LIMIT 0, 1</code>表示只返回查找到的第一个用户信息，这也是为什么两个payload都只出现了 id &#x3D; 1 的用户的信息。</p>
+<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p>再来说注释</p>
+<p>举例,想通过注释把后面的LIMIT进行注释掉</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/sql2.png" class>
+<p>当然这个是MySQL workbench里面进行的查询，</p>
+<p>可以构造一个类似的payload <code>id = 1&#39; or &#39;1&#39; = &#39;1&#39; --+</code>，不过使用之后得到的SQL语句是<br><code>SELECT * FROM user WHERE id=&#39;1&#39; or &#39;1&#39; = &#39;1&#39; -- &#39; LIMIT 0,1</code>并返回 id&#x3D;1的记录</p>
+<p>其实在这里注释符号起效了，但是在原代码里面还有另一个限制条件</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token variable">$row</span> <span class="token operator">=</span> <span class="token function">mysql_fetch_array</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$row</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#123;</span>
+  	<span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;font size='5' color= '#99FF00'>"</span><span class="token punctuation">;</span>
+  	<span class="token keyword">echo</span> <span class="token string single-quoted-string">'Your Login name:'</span><span class="token operator">.</span> <span class="token variable">$row</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'username'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  	<span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;br>"</span><span class="token punctuation">;</span>
+  	<span class="token keyword">echo</span> <span class="token string single-quoted-string">'Your Password:'</span> <span class="token operator">.</span><span class="token variable">$row</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'password'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  	<span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;/font>"</span><span class="token punctuation">;</span>
+  	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">else</span> 
+	<span class="token punctuation">&#123;</span>
+	<span class="token keyword">echo</span> <span class="token string single-quoted-string">'&lt;font color= "#FFFF00">'</span><span class="token punctuation">;</span>
+	<span class="token function">print_r</span><span class="token punctuation">(</span><span class="token function">mysql_error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;/font>"</span><span class="token punctuation">;</span>  
+	<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<blockquote>
+<p>mysqli_fetch_array 用于从结果集中获取一行作为关联数组，而在这段代码中只调用了一次，因此只获取了结果集的第一行。</p>
+</blockquote>
+<p>在这种双重限制之下，即使绕过了 LIMIT 的限制，也还有第二重 限制 。</p>
+<hr>
+
+
+<p>我们换一个代码进行测试</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+       <span class="token comment">// 获取结果集中的行数</span>
+       <span class="token variable">$numRows</span> <span class="token operator">=</span> <span class="token function">mysqli_num_rows</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+       <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$numRows</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+           <span class="token comment">// 遍历结果集中的每一行</span>
+           <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token variable">$row</span> <span class="token operator">=</span> <span class="token function">mysqli_fetch_array</span><span class="token punctuation">(</span><span class="token variable">$result</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+               <span class="token comment">// 遍历当前行的每一列</span>
+               <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$row</span> <span class="token keyword">as</span> <span class="token variable">$column</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                   <span class="token keyword">echo</span> <span class="token variable">$column</span> <span class="token operator">.</span> <span class="token string double-quoted-string">" "</span><span class="token punctuation">;</span>
+               <span class="token punctuation">&#125;</span>
+               <span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;br>"</span><span class="token punctuation">;</span>
+           <span class="token punctuation">&#125;</span>
+       <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+           <span class="token keyword">echo</span> <span class="token string double-quoted-string">"未找到匹配的记录"</span><span class="token punctuation">;</span>
+       <span class="token punctuation">&#125;</span>
+   <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+       <span class="token keyword">echo</span> <span class="token string double-quoted-string">"查询失败: "</span> <span class="token operator">.</span> <span class="token function">mysqli_error</span><span class="token punctuation">(</span><span class="token variable">$conn</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>进行注入攻击则会返回所有记录。</p>
+<p><font size="2">追寻短短几行字中的原理的过程得让人用一生去治愈……</font></p>
+<hr>
+<hr>
+
+
+<h2 id="AND"><a href="#AND" class="headerlink" title="AND"></a>AND</h2><p>把 <code>or</code>换成<code>and</code><br>就拿最近的这个 <code>id = 1&#39; or &#39;1&#39; = &#39;1&#39; --+</code> 举例</p>
+<p><code>id = 1&#39; and &#39;1&#39; = &#39;1&#39; --+</code></p>
+<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">sql thing: SELECT * FROM user WHERE id='1' and '1' = '1' -- ' LIMIT 0,1
+Your name is: John&lt;br>your psw: daidgiaegigak<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>我的理解：</p>
+<ul>
+<li><p><strong>or条件下</strong>，字符’1’等于‘1’为真——<code>making the entire condition true for every row</code>，id&#x3D;1，id&#x3D;2无所谓，执行语句的只是看true or not，true就返回，而这个做到为每一个记录发放 true 通行证，所以返回了所有记录。</p>
+</li>
+<li><p>而<strong>and条件下</strong>，<code>Since &#39;1&#39;=&#39;1&#39; is always true, the condition simplifies to id = &#39;1&#39;, and it checks whether the id is equal to the string &#39;1&#39;.</code>也是’1’&#x3D;’1’永远为 true ， 这个条件语句就会被简化成 id &#x3D; 1’ （可以理解为为 true 简写），但执行者只看见 id &#x3D; 1‘ 并且在该语句中为 true ，所以就只返回了id &#x3D; 1的记录</p>
+</li>
+</ul>
+<hr>
+
+<h2 id="order-by"><a href="#order-by" class="headerlink" title="order by"></a>order by</h2><p>正常的order by 用法：</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/order3.png" class>
+
+<p>而在SQL注入中用的是：</p>
+<p><code>SELECT * FROM user WHERE id=&#39;1&#39; order by 4 -- ；</code></p>
+<p>payload就是 <code>id = 1&#39; order by 4 --+</code></p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/order1.png" class>
+
+<p>当修改 order by后面的数字为5的时候：</p>
+<p>Error Code: 1054. Unknown column ‘5’ in ‘order clause’</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/order2.png" class>
+
+<p>可以由这种对比中看出这个 order by 究竟在 by 个什么——<strong>columns</strong>。</p>
+<p>这个测试表里面有 4 个columns：</p>
+<ul>
+<li>username</li>
+<li>email</li>
+<li>password</li>
+<li>id</li>
+</ul>
+<p>超出column数的时候就会报错，而没有超过都会正常回显，借此可以知道有几列(column)</p>
+<blockquote>
+<p>当你指定ORDER BY 4，数据库会尝试按照第4列的值对结果进行排序。如果user表有至少4列，这个查询就会成功执行并返回结果。但是，如果user表少于4列，数据库就无法找到第4列，这个查询就会失败，并返回一个错误，通常是“Unknown column ‘4’ in ‘order clause’”。</p>
+</blockquote>
+<hr>
+
+<h2 id="联合查询"><a href="#联合查询" class="headerlink" title="联合查询"></a>联合查询</h2><h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><p><code>SELECT * FROM user where id = &#39;-1&#39; union select 1,2,3,4-- &#39;</code></p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/union1.png" class>
+
+<blockquote>
+<p>SELECT * FROM user where id &#x3D; ‘-1’ union select 1,2,3,4– ‘的含义是，先从user表中选择那些id等于-1的行，然后将结果与select 1,2,3,4的结果合并。<br>UNION操作符用于合并两个或多个SELECT语句的结果集。在这个查询中，union select 1,2,3,4会创建一个临时的结果集，其中包含一行，这一行的值分别是1,2,3,4。</p>
+</blockquote>
+<p>id &#x3D; -1 这一行其实不存在，如果使用了存在的id进行 union：</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/union2.png" class>
+
+<p>这一个可以理解为寻找回显点。</p>
+<p>id&#x3D;1</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/1.png" class>
+
+<p>id&#x3D;2</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/2.png" class>
+
+<p>id&#x3D;-1’ union select 1,2,3–+</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/3.png" class>
+
+<p>三张图片对比，找到回显点是 <code>name</code> 和 <code>password</code>这两个地方</p>
+<hr>
+
+<h3 id="2"><a href="#2" class="headerlink" title="2"></a>2</h3><p><code>id = -1&#39; union select 1, database(), version() --+</code></p>
+<p>用那个测试表</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/database1.png" class>
+
+<ul>
+<li>最上面的那行告诉了回显点在 1 和 3</li>
+<li>在SQL语句中找到相应位置进行修改</li>
+<li>最后可以看到在 1 和 3 对应的位置，分别修改成了 数据库的名称 demo 和版本 8.0.34</li>
+</ul>
+<hr>
+
+<h2 id="Group-concat"><a href="#Group-concat" class="headerlink" title="Group_concat"></a>Group_concat</h2><p>到这里的时候换了一个数据库，所以数据库内容有些许不同。</p>
+<blockquote>
+<p>GROUP_CONCAT时MySQL数据库提供的一个聚合函数</p>
+</blockquote>
+<p>在数据库测试</p>
+<p><code>SELECT * FROM user WHERE id=&#39;-1&#39; UNION SELECT 1, 2, GROUP_CONCAT(table_name) FROM information_schema.tables WHERE table_schema=&#39;demosql&#39; -- ;</code></p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/groupconcat1.png" class>
+
+<p>不过在demo界面进行测试的时候出了点意外：</p>
+<ul>
+<li>查询失败: SELECT command denied to user ‘demo‘@’localhost’ for table ‘tables’</li>
+</ul>
+<p>悲伤的故事，没有足够权限……提权的事情之后说。</p>
+<p>不过我们看sqli lab</p>
+<ul>
+<li><code>id=-1%27%20union%20select%201,2,%20GROUP_CONCAT(table_name)%20from%20information_schema.tables%20WHERE%20table_schema=%27security%27--+</code></li>
+</ul>
+<p>也就是</p>
+<ul>
+<li><code>id=-1&#39; union select 1,2, GROUP_CONCAT(table_name) from information_schema.tables WHERE table_schema=&#39;security&#39;</code></li>
+</ul>
+<img src="/rustymoon/2023/12/07/SQLi-labs/concat2.png" class>
+
+<hr>
+
+<h3 id="一个位置问题"><a href="#一个位置问题" class="headerlink" title="一个位置问题"></a>一个位置问题</h3><p>这里也有一个有趣的点，</p>
+<p>如果你是写成  1，group_concat.., 3 那么就会报错</p>
+<ul>
+<li>UNION SELECT 选择了 <strong>两个</strong> 表达式：<b>1, GROUP_CONCAT(table_name)</b>。</li>
+</ul>
+<p>而上面的 1，2，group_concatxxx</p>
+<ul>
+<li>UNION SELECT 选择了 <strong>三个</strong> 表达式：<b>1, 2, GROUP_CONCAT(table_name)</b>。</li>
+</ul>
+<p>原因也很简单（找半天）： WHERE 后面指定的 键不能有 <code>,</code>，会引起语法错误。</p>
+<img src="/rustymoon/2023/12/07/SQLi-labs/error1.png" class>
+
+<p>这个语句的目的是将 SELECT <code>*</code> FROM user WHERE id&#x3D;’-1’ 的结果与SELECT 1, 2, GROUP_CONCAT(table_name) FROM information_schema.tables WHERE table_schema&#x3D;’demosql’的结果合并在一起。</p>
+<p>因为SELECT <code>*</code> FROM user选择了3个列（该user表中有3个列），所以UNION SELECT也需要选择3个值，以便结果的列数相同。</p>
+<hr>
+
+<p>但是也不是不能把 3 写在后面，但是不是 最后面：</p>
+<ul>
+<li><code>SELECT * FROM user WHERE id=&#39;-1&#39; UNION SELECT 1, GROUP_CONCAT(table_name), 3 FROM information_schema.tables WHERE table_schema=&#39;demosql&#39; -- ;</code></li>
+</ul>
+<p>payload version:</p>
+<ul>
+<li><code>?id=-1&#39; UNION SELECT 1, GROUP_CONCAT(table_name), 3 FROM information_schema.tables WHERE table_schema=&#39;demosql&#39; --+</code></li>
+</ul>
+<img src="/rustymoon/2023/12/07/SQLi-labs/concat3.png" class>
+
+
+<h3 id="多输出？"><a href="#多输出？" class="headerlink" title="多输出？"></a>多输出？</h3><p>前面提到即使注释掉了 LIMIT 0, 1 也还有一个if条件语句进行输出限制，为什么这里多个表名就能一起输出了？（有这个疑问一方面是我和那个if斗争太久，一方面是没怎么去看group_concat的作用。）</p>
+<p>原因 is：</p>
+<blockquote>
+<p>当使用GROUP_CONCAT(table_name)来获取所有的表名时，所有的表名都会被连接成一个长字符串，然后作为一条记录返回。</p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>LEARN</tag>
+        <tag>SQL Injection</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>daily</title>
     <url>/rustymoon/2023/11/26/daily/</url>
     <content><![CDATA[<p>No Glamour in the hammer~</p>
@@ -1048,6 +1276,130 @@ Stack trace:
     <title>Hello World</title>
     <url>/rustymoon/2023/10/28/hello-world/</url>
     <content><![CDATA[<p>More info: <a href="https://hexo.io/docs">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>ssrfme</title>
+    <url>/rustymoon/2023/12/05/ssrfme/</url>
+    <content><![CDATA[<p>do you know ssrf?</p>
+<span id="more"></span>
+
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#! /usr/bin/env python</span>
+<span class="token comment"># encoding=utf-8</span>
+
+<span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask
+<span class="token keyword">from</span> flask <span class="token keyword">import</span> request
+<span class="token keyword">import</span> socket
+<span class="token keyword">import</span> hashlib
+<span class="token keyword">import</span> urllib
+<span class="token keyword">import</span> sys
+<span class="token keyword">import</span> os
+<span class="token keyword">import</span> json
+
+<span class="token builtin">reload</span><span class="token punctuation">(</span>sys<span class="token punctuation">)</span>
+sys<span class="token punctuation">.</span>setdefaultencoding<span class="token punctuation">(</span><span class="token string">'latin1'</span><span class="token punctuation">)</span>
+
+app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+secert_key <span class="token operator">=</span> os<span class="token punctuation">.</span>urandom<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">class</span> <span class="token class-name">Task</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> action<span class="token punctuation">,</span> param<span class="token punctuation">,</span> sign<span class="token punctuation">,</span> ip<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>action <span class="token operator">=</span> action
+        self<span class="token punctuation">.</span>param <span class="token operator">=</span> param
+        self<span class="token punctuation">.</span>sign <span class="token operator">=</span> sign
+        self<span class="token punctuation">.</span>sandbox <span class="token operator">=</span> md5<span class="token punctuation">(</span>ip<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token keyword">not</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>exists<span class="token punctuation">(</span>self<span class="token punctuation">.</span>sandbox<span class="token punctuation">)</span><span class="token punctuation">:</span>  <span class="token comment"># SandBox For Remote_Addr</span>
+            os<span class="token punctuation">.</span>mkdir<span class="token punctuation">(</span>self<span class="token punctuation">.</span>sandbox<span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">Exec</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        result <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+        result<span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">500</span>
+        <span class="token keyword">if</span> self<span class="token punctuation">.</span>checkSign<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token string">"scan"</span> <span class="token keyword">in</span> self<span class="token punctuation">.</span>action<span class="token punctuation">:</span>
+                tmpfile <span class="token operator">=</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"./%s/result.txt"</span> <span class="token operator">%</span> self<span class="token punctuation">.</span>sandbox<span class="token punctuation">,</span> <span class="token string">'w'</span><span class="token punctuation">)</span>
+                resp <span class="token operator">=</span> scan<span class="token punctuation">(</span>self<span class="token punctuation">.</span>param<span class="token punctuation">)</span>
+                <span class="token keyword">if</span> resp <span class="token operator">==</span> <span class="token string">"Connection Timeout"</span><span class="token punctuation">:</span>
+                    result<span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span> <span class="token operator">=</span> resp
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    <span class="token keyword">print</span> resp
+                    tmpfile<span class="token punctuation">.</span>write<span class="token punctuation">(</span>resp<span class="token punctuation">)</span>
+                    tmpfile<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    result<span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">200</span>
+            <span class="token keyword">if</span> <span class="token string">"read"</span> <span class="token keyword">in</span> self<span class="token punctuation">.</span>action<span class="token punctuation">:</span>
+                f <span class="token operator">=</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"./%s/result.txt"</span> <span class="token operator">%</span> self<span class="token punctuation">.</span>sandbox<span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span>
+                result<span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">200</span>
+                result<span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span> <span class="token operator">=</span> f<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> result<span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">500</span><span class="token punctuation">:</span>
+                result<span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"Action Error"</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            result<span class="token punctuation">[</span><span class="token string">'code'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">500</span>
+            result<span class="token punctuation">[</span><span class="token string">'msg'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"Sign Error"</span>
+        <span class="token keyword">return</span> result
+
+    <span class="token keyword">def</span> <span class="token function">checkSign</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> getSign<span class="token punctuation">(</span>self<span class="token punctuation">.</span>action<span class="token punctuation">,</span> self<span class="token punctuation">.</span>param<span class="token punctuation">)</span> <span class="token operator">==</span> self<span class="token punctuation">.</span>sign<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token boolean">True</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token boolean">False</span>
+
+
+<span class="token comment"># generate Sign For Action Scan.</span>
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">"/geneSign"</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">,</span> <span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">geneSign</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    param <span class="token operator">=</span> urllib<span class="token punctuation">.</span>unquote<span class="token punctuation">(</span>request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"param"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    action <span class="token operator">=</span> <span class="token string">"scan"</span>
+    <span class="token keyword">return</span> getSign<span class="token punctuation">(</span>action<span class="token punctuation">,</span> param<span class="token punctuation">)</span>
+
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/De1ta'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'GET'</span><span class="token punctuation">,</span> <span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">challenge</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    action <span class="token operator">=</span> urllib<span class="token punctuation">.</span>unquote<span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"action"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    param <span class="token operator">=</span> urllib<span class="token punctuation">.</span>unquote<span class="token punctuation">(</span>request<span class="token punctuation">.</span>args<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"param"</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    sign <span class="token operator">=</span> urllib<span class="token punctuation">.</span>unquote<span class="token punctuation">(</span>request<span class="token punctuation">.</span>cookies<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">"sign"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    ip <span class="token operator">=</span> request<span class="token punctuation">.</span>remote_addr
+    <span class="token keyword">if</span> waf<span class="token punctuation">(</span>param<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"No Hacker!!!!"</span>
+    task <span class="token operator">=</span> Task<span class="token punctuation">(</span>action<span class="token punctuation">,</span> param<span class="token punctuation">,</span> sign<span class="token punctuation">,</span> ip<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> json<span class="token punctuation">.</span>dumps<span class="token punctuation">(</span>task<span class="token punctuation">.</span>Exec<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+
+<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"code.txt"</span><span class="token punctuation">,</span> <span class="token string">"r"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">scan</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    socket<span class="token punctuation">.</span>setdefaulttimeout<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token keyword">try</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> urllib<span class="token punctuation">.</span>urlopen<span class="token punctuation">(</span>param<span class="token punctuation">)</span><span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">50</span><span class="token punctuation">]</span>
+    <span class="token keyword">except</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">"Connection Timeout"</span>
+
+
+<span class="token keyword">def</span> <span class="token function">getSign</span><span class="token punctuation">(</span>action<span class="token punctuation">,</span> param<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> hashlib<span class="token punctuation">.</span>md5<span class="token punctuation">(</span>secert_key <span class="token operator">+</span> param <span class="token operator">+</span> action<span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">md5</span><span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> hashlib<span class="token punctuation">.</span>md5<span class="token punctuation">(</span>content<span class="token punctuation">)</span><span class="token punctuation">.</span>hexdigest<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+
+<span class="token keyword">def</span> <span class="token function">waf</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    check <span class="token operator">=</span> param<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> check<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span><span class="token string">"gopher"</span><span class="token punctuation">)</span> <span class="token keyword">or</span> check<span class="token punctuation">.</span>startswith<span class="token punctuation">(</span><span class="token string">"file"</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">True</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token boolean">False</span>
+
+
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
+    app<span class="token punctuation">.</span>debug <span class="token operator">=</span> <span class="token boolean">False</span>
+    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>host<span class="token operator">=</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> port<span class="token operator">=</span><span class="token number">80</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<p>(参考一)[<a href="https://www.codenong.com/cs109680676/]">https://www.codenong.com/cs109680676/]</a><br>(参考二)[<a href="https://xz.aliyun.com/t/6050]">https://xz.aliyun.com/t/6050]</a><br>(参考三)[<a href="https://www.cnblogs.com/x1x20z/p/12890700.html]">https://www.cnblogs.com/x1x20z/p/12890700.html]</a><br>(参考四)[<a href="https://www.cnblogs.com/20175211lyz/p/11440316.html]">https://www.cnblogs.com/20175211lyz/p/11440316.html]</a></p>
 ]]></content>
   </entry>
   <entry>
