@@ -1232,39 +1232,13 @@ database_name <span class="token operator">=</span> <span class="token string">'
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h1 id="maybe-or-maybe-not"><a href="#maybe-or-maybe-not" class="headerlink" title="maybe or maybe not"></a>maybe or maybe not</h1><p>前几章的基本是这些。</p>
-<p>(more)[<a href="http://drops.xmd5.com/static/drops/tips-7840.html]">http://drops.xmd5.com/static/drops/tips-7840.html]</a></p>
-<p>(and)[<a href="https://ctf-wiki.org/web/sqli/#_10]">https://ctf-wiki.org/web/sqli/#_10]</a></p>
-<p>(more技巧)[<a href="http://drops.xmd5.com/static/drops/tips-7299.html]">http://drops.xmd5.com/static/drops/tips-7299.html]</a></p>
+<p><a href="http://drops.xmd5.com/static/drops/tips-7840.html">more</a></p>
+<p><a href="https://ctf-wiki.org/web/sqli/#_10">and</a></p>
+<p><a href="http://drops.xmd5.com/static/drops/tips-7299.html">more技巧</a></p>
 ]]></content>
       <tags>
         <tag>LEARN</tag>
         <tag>SQL Injection</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>daily</title>
-    <url>/rustymoon/2023/11/26/daily/</url>
-    <content><![CDATA[<p>No Glamour in the hammer~</p>
-<span id="more"></span>
-
-<h1 id="11-26"><a href="#11-26" class="headerlink" title="11-26"></a>11-26</h1><p>这个周在当尖叫皇后，就是别人负责皇后我负责尖叫。</p>
-<p>我也不知道为什么这个周会过得如此迷惑的忙碌。</p>
-<p>可能是快来到的期末和一堆被冷落的作业。</p>
-<p>所以本周我就做了一个firewall ppt，做了实验课的实验一。</p>
-<p>迷茫、惶恐、无语、怒极反笑。</p>
-<p>总结一下就是，看见firewall这个词就想吐了。</p>
-<p>在周天晚上一把子把所有有关firewall的笔记都删除了，可能得缓缓才能写出笔记上传。而且我的课设作业和实验一个接一个，这辈子没这么烦过。</p>
-<p>之前还在问chatgpt怎么写weekly to-do list，现在我已经知道了。这么多破事（姑且让我这么称呼吧），好了写完这个我就要回去了，我要去买晚饭我要饿死了。</p>
-<p>回去路上整理to do list吧。<br>一张心情写照：</p>
-<img src="/rustymoon/2023/11/26/daily/%E9%9D%A2%E5%AF%B9jyp.jpg" class>
-
-<h1 id="11-27"><a href="#11-27" class="headerlink" title="11-27"></a>11-27</h1><p>今天稍微策划了一下时间，好了我现在要去学数电了，在这之前我学了ssrf和sql注入了的一部分，但是但是，还没有彻底搞懂，之前卡住我的那个demo问题原来是变量名少打一个h……这个键盘的h键真是……<br>配图以表心情：</p>
-<img src="/rustymoon/2023/11/26/daily/%E7%94%84%E5%AC%9B%E4%BC%A01.jpg" class>
-
-<h1 id="12-5"><a href="#12-5" class="headerlink" title="12-5"></a>12-5</h1><p>终于把这个主题进一步修改了……不过真的花了很长时间找有用的。<br>怎么这个学期就又要结束了？<br>期末袭来。</p>
-]]></content>
-      <tags>
-        <tag>orn</tag>
       </tags>
   </entry>
   <entry>
@@ -1503,6 +1477,33 @@ database_name <span class="token operator">=</span> <span class="token string">'
 ]]></content>
       <tags>
         <tag>XXE</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>daily</title>
+    <url>/rustymoon/2023/11/26/daily/</url>
+    <content><![CDATA[<p>No Glamour in the hammer~</p>
+<span id="more"></span>
+
+<h1 id="11-26"><a href="#11-26" class="headerlink" title="11-26"></a>11-26</h1><p>这个周在当尖叫皇后，就是别人负责皇后我负责尖叫。</p>
+<p>我也不知道为什么这个周会过得如此迷惑的忙碌。</p>
+<p>可能是快来到的期末和一堆被冷落的作业。</p>
+<p>所以本周我就做了一个firewall ppt，做了实验课的实验一。</p>
+<p>迷茫、惶恐、无语、怒极反笑。</p>
+<p>总结一下就是，看见firewall这个词就想吐了。</p>
+<p>在周天晚上一把子把所有有关firewall的笔记都删除了，可能得缓缓才能写出笔记上传。而且我的课设作业和实验一个接一个，这辈子没这么烦过。</p>
+<p>之前还在问chatgpt怎么写weekly to-do list，现在我已经知道了。这么多破事（姑且让我这么称呼吧），好了写完这个我就要回去了，我要去买晚饭我要饿死了。</p>
+<p>回去路上整理to do list吧。<br>一张心情写照：</p>
+<img src="/rustymoon/2023/11/26/daily/%E9%9D%A2%E5%AF%B9jyp.jpg" class>
+
+<h1 id="11-27"><a href="#11-27" class="headerlink" title="11-27"></a>11-27</h1><p>今天稍微策划了一下时间，好了我现在要去学数电了，在这之前我学了ssrf和sql注入了的一部分，但是但是，还没有彻底搞懂，之前卡住我的那个demo问题原来是变量名少打一个h……这个键盘的h键真是……<br>配图以表心情：</p>
+<img src="/rustymoon/2023/11/26/daily/%E7%94%84%E5%AC%9B%E4%BC%A01.jpg" class>
+
+<h1 id="12-5"><a href="#12-5" class="headerlink" title="12-5"></a>12-5</h1><p>终于把这个主题进一步修改了……不过真的花了很长时间找有用的。<br>怎么这个学期就又要结束了？<br>期末袭来。</p>
+<h1 id="12-11"><a href="#12-11" class="headerlink" title="12-11"></a>12-11</h1><p>难以置信sql重学之后发现之前和没学一样。<br>有点烦。事情好多。但是都是karma我能怎么说。</p>
+]]></content>
+      <tags>
+        <tag>orn</tag>
       </tags>
   </entry>
   <entry>
